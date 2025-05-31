@@ -356,6 +356,43 @@ app.delete('/api/doctor/pacient/:id', async (req, res) => {
   }
 });
 
+app.get('/api/doctor/profile', async (req, res) => {
+  const { userId, email } = req.query;
+  if (!userId && !email) {
+    return res.status(400).json({ error: 'Trebuie să trimiți userId sau email.' });
+  }
+
+  try {
+    let result;
+    if (userId) {
+      result = await sql.query`
+        SELECT 
+          u.UserID, u.Email, u.UserType, 
+          m.MedicID, m.Nume, m.Prenume, m.Specializare, m.Telefon
+        FROM Utilizatori u
+        INNER JOIN Medici m ON u.UserID = m.UserID
+        WHERE u.UserID = ${userId}
+      `;
+    } else {
+      result = await sql.query`
+        SELECT 
+          u.UserID, u.Email, u.UserType, 
+          m.MedicID, m.Nume, m.Prenume, m.Specializare, m.Telefon
+        FROM Utilizatori u
+        INNER JOIN Medici m ON u.UserID = m.UserID
+        WHERE u.Email = ${email}
+      `;
+    }
+
+    if (!result.recordset.length) {
+      return res.status(404).json({ error: 'Doctorul nu a fost găsit.' });
+    }
+    res.json(result.recordset[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });

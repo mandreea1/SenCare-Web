@@ -13,6 +13,8 @@ import EditPacient from './pages/doctor/EditPacient';
 import './App.css';
 
 function App() {
+  const onLogout = () => {};
+  const user = { email: "doctor@email.com" };
   return (
     <div className="App">
       <Routes>
@@ -21,11 +23,15 @@ function App() {
         <Route path="/patient" element={<PatientDashboard />} />
         <Route path="/patient/profile" element={<PatientView />} />
         <Route path="/patient/history" element={<PatientHistory />} />
-        <Route path="/doctor" element={<DoctorDashboard />} />
-        <Route path="/doctor/add-pacient" element={<AdaugaPacient />} />
-        <Route path="/doctor/pacienti" element={<PacientiDoctor />} />
-<Route path="/doctor/pacient/:id" element={<PacientDetalii />} />
-<Route path="/doctor/pacient/:id/edit" element={<EditPacient />} />
+        
+        {/* Nested doctor routes */}
+        <Route path="/doctor" element={<DoctorDashboard onLogout={onLogout} user={user} />}>
+          <Route path="add-pacient" element={<AdaugaPacient />} />
+          <Route path="pacienti" element={<PacientiDoctor />} />
+          <Route path="pacient/:id" element={<PacientDetalii />} />
+          <Route path="pacient/:id/edit" element={<EditPacient />} />
+        </Route>
+
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </div>

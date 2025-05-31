@@ -37,7 +37,8 @@ const Login = () => {
     if (response.ok) {
       // Redirecționează în funcție de tipul utilizatorului
             if (data.userType && data.userType.toLowerCase() === 'doctor') {
-        localStorage.setItem('email', formData.email);
+              localStorage.setItem('userId', data.userId); 
+              localStorage.setItem('email', formData.email);
               navigate('/doctor');
       } else if (data.userType && data.userType.toLowerCase() === 'pacient') {
         navigate('/patient');
