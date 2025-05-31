@@ -19,7 +19,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch('${process.env.REACT_APP_BACKEND_URL}/api/admin/add-doctor', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/add-doctor`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
