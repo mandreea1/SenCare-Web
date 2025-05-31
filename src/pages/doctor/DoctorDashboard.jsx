@@ -3,7 +3,6 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { FaUserMd, FaSignOutAlt } from 'react-icons/fa';
 
 
-
 const sidebarStyles = {
   sidebar: {
     width: 220,
@@ -124,7 +123,9 @@ export default function DoctorDashboard({ onLogout, user }) {
           return;
         }
         // Folosește endpoint-ul corect!
-        const res = await fetch(`/api/doctor/profile?userId=${userId}`);
+        
+        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+        const res = await fetch(`${BACKEND_URL}/api/doctor/profile?userId=${userId}`);
         if (!res.ok) throw new Error('Eroare la profil doctor');
         const data = await res.json();
         if (!data || !data.Nume) {

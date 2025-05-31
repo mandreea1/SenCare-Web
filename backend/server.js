@@ -365,24 +365,24 @@ app.get('/api/doctor/profile', async (req, res) => {
   try {
     let result;
     if (userId) {
-      result = await sql.query`
-        SELECT 
-          u.UserID, u.Email, u.UserType, 
-          m.MedicID, m.Nume, m.Prenume, m.Specializare, m.Telefon
-        FROM Utilizatori u
-        INNER JOIN Medici m ON u.UserID = m.UserID
-        WHERE u.UserID = ${userId}
-      `;
-    } else {
-      result = await sql.query`
-        SELECT 
-          u.UserID, u.Email, u.UserType, 
-          m.MedicID, m.Nume, m.Prenume, m.Specializare, m.Telefon
-        FROM Utilizatori u
-        INNER JOIN Medici m ON u.UserID = m.UserID
-        WHERE u.Email = ${email}
-      `;
-    }
+  result = await sql.query`
+    SELECT 
+      u.UserID, u.Email, u.UserType, 
+      m.MedicID, m.Nume, m.Prenume, m.Specializare, m.Telefon
+    FROM Utilizatori u
+    INNER JOIN Medici m ON u.UserID = m.UserID
+    WHERE u.UserID = ${userId} AND u.UserType = 'doctor'
+  `;
+} else {
+  result = await sql.query`
+    SELECT 
+      u.UserID, u.Email, u.UserType, 
+      m.MedicID, m.Nume, m.Prenume, m.Specializare, m.Telefon
+    FROM Utilizatori u
+    INNER JOIN Medici m ON u.UserID = m.UserID
+    WHERE u.Email = ${email} AND u.UserType = 'doctor'
+  `;
+}
 
     if (!result.recordset.length) {
       return res.status(404).json({ error: 'Doctorul nu a fost găsit.' });
