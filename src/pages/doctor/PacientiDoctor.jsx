@@ -10,7 +10,7 @@ function PacientiDoctor() {
   useEffect(() => {
     const fetchPacienti = async () => {
       try {
-        const res = await axios.get('http://localhost:4000/api/doctor/pacienti', {
+        const res = await axios.get('${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacienti', {
           params: { doctorEmail }
         });
         setPacienti(res.data);
@@ -24,7 +24,7 @@ function PacientiDoctor() {
   const handleSterge = async (id) => {
     if (!window.confirm('Sigur vrei să ștergi acest pacient?')) return;
     try {
-      await axios.delete(`http://localhost:4000/api/doctor/pacient/${id}`);
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`);
       setPacienti(pacienti.filter(p => p.PacientID !== id));
     } catch (err) {
       setMesaj('Eroare la ștergere: ' + (err.response?.data?.error || err.message));

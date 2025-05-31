@@ -10,7 +10,7 @@ function PacientDetalii() {
   useEffect(() => {
     const fetchPacient = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/api/doctor/pacient/${id}`);
+        const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`);
         setPacient(res.data);
       } catch (err) {
         setMesaj('Eroare la încărcare: ' + (err.response?.data?.error || err.message));

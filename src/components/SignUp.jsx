@@ -34,7 +34,7 @@ const SignUp = ({ isDoctor }) => {
         }
 
         try {
-            const response = await axios.post('http://localhost:4000/api/signup', {
+            const response = await axios.post('${process.env.REACT_APP_BACKEND_URL}/api/signup', {
                 Email: formData.Email,
                 email: formData.email,
                 password: formData.password
