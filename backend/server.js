@@ -356,6 +356,9 @@ app.delete('/api/doctor/pacient/:id', async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('SenCare backend API running.');
+});
 connectToDb().then(() => {
   app.listen(PORT, () => {
     console.log(`Serverul rulează pe http://localhost:${PORT}`);
