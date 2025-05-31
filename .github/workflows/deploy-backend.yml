@@ -1,0 +1,36 @@
+name: Deploy Backend to Azure App Service
+
+on:
+  push:
+    branches:
+      - main # sau branch-ul tău principal
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (production only)
+        run: |
+          cd backend
+          npm ci --omit=dev
+
+      - name: Zip backend for deployment
+        run: |
+          cd backend
+          zip -r ../backend.zip .
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: SenCareApp-backend
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: ./backend.zip
