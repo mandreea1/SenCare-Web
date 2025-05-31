@@ -27,7 +27,7 @@ function AdaugaPacient() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      await axios.post('${process.env.REACT_APP_BACKEND_URL}/api/doctor/add-pacient', {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/add-pacient`, {
         doctorEmail,
         ...form
       });
