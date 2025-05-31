@@ -10,7 +10,8 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 
 const corsOptions = {
-  origin: 'https://blue-dune-02cbb2810.6.azurestaticapps.net', // Pune aici URL-ul exact al SWA
+  origin: ['https://blue-dune-02cbb2810.6.azurestaticapps.net', // Pune aici URL-ul exact al SWA
+  'http://localhost:3000'],
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
