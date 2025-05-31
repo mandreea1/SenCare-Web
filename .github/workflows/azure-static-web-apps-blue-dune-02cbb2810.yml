@@ -15,10 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
+
+      - name: Set legacy OpenSSL provider for Node.js 17+
+        run: echo "NODE_OPTIONS=--openssl-legacy-provider" >> $GITHUB_ENV
 
       - name: Fix react-scripts permissions
         run: chmod +x node_modules/.bin/react-scripts
