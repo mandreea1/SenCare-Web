@@ -1,0 +1,48 @@
+.patient-view {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.patient-view h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.profile-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section {
+  margin-bottom: 2rem;
+}
+
+.profile-section:last-child {
+  margin-bottom: 0;
+}
+
+.profile-section h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 0.5rem;
+}
+
+.info-group {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.info-group label {
+  width: 150px;
+  font-weight: 500;
+  color: #555;
+}
+
+.info-group span {
+  color: #333;
+} 

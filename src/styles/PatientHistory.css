@@ -1,0 +1,72 @@
+.patient-history {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.patient-history h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.history-timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.history-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #e0e0e0;
+}
+
+.history-item {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-left: 2rem;
+}
+
+.history-item::before {
+  content: '';
+  position: absolute;
+  left: -0.5rem;
+  top: 0;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: #007bff;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px #007bff;
+}
+
+.history-date {
+  font-weight: 500;
+  color: #007bff;
+  margin-bottom: 0.5rem;
+}
+
+.history-content {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.history-content h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.history-content p {
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.history-content p:last-child {
+  margin-bottom: 0;
+} 

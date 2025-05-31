@@ -1,0 +1,141 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  padding: 1rem;
+}
+
+.login-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.logo {
+  margin-bottom: 2rem;
+}
+
+.logo img {
+  width: 120px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.logo h1 {
+  color: #2D3748;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.user-type-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.user-type-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #E2E8F0;
+  border-radius: 10px;
+  background: white;
+  color: #4A5568;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-type-btn i {
+  font-size: 1.2rem;
+}
+
+.user-type-btn.active {
+  border-color: #3182CE;
+  color: #3182CE;
+  background: #EBF8FF;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3182CE;
+}
+
+.form-group input::placeholder {
+  color: #A0AEC0;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #3182CE;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+  background: #2C5282;
+}
+
+.forgot-password {
+  margin-top: 1rem;
+}
+
+.forgot-password a {
+  color: #3182CE;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.signup-link {
+  margin-top: 2rem;
+  color: #4A5568;
+  font-size: 0.9rem;
+}
+
+.signup-link a {
+  color: #3182CE;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+
+  .user-type-selector {
+    flex-direction: column;
+  }
+
+  .user-type-btn {
+    width: 100%;
+    justify-content: center;
+  }
+} 
