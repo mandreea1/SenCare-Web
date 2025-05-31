@@ -3,7 +3,7 @@ name: Deploy Backend to Azure App Service
 on:
   push:
     branches:
-      - main # sau branch-ul tău principal
+      - main
 
 jobs:
   build-and-deploy:
@@ -23,14 +23,9 @@ jobs:
           cd backend
           npm ci --omit=dev
 
-      - name: Zip backend for deployment
-        run: |
-          cd backend
-          zip -r ../backend.zip .
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: SenCareApp-backend
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: ./backend.zip
+          package: ./backend
