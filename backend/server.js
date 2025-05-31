@@ -8,6 +8,11 @@ const PORT = 4000;
 const bcrypt = require('bcrypt');
 
 const cors = require('cors');
+
+const corsOptions = {
+  origin: 'https://blue-dune-02cbb2810.6.azurestaticapps.net', // Pune aici URL-ul exact al SWA
+  optionsSuccessStatus: 200
+};
 app.use(cors());
 app.use(express.json());
 
