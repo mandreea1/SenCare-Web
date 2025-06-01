@@ -275,7 +275,17 @@ app.put('/api/doctor/pacient/:id', async (req, res) => {
   try {
     await transaction.begin();
 
-    // Update Pacienti
+    // 1. Ia valorile vechi înainte de update
+    const vechi = await transaction.request()
+      .input('PacientID', sql.Int, id)
+      .query(`
+        SELECT IstoricMedical, Alergii, ConsultatiiCardiologice
+        FROM DateMedicale
+        WHERE PacientID = @PacientID
+      `);
+    const vechiDate = vechi.recordset[0];
+
+    // 2. Update Pacienti
     await transaction.request()
       .input('PacientID', sql.Int, id)
       .input('Nume', sql.NVarChar(255), Nume)
@@ -288,7 +298,7 @@ app.put('/api/doctor/pacient/:id', async (req, res) => {
       .input('LocMunca', sql.NVarChar(255), LocMunca)
       .query(`UPDATE Pacienti SET Nume=@Nume, Prenume=@Prenume, Varsta=@Varsta, CNP=@CNP, Adresa=@Adresa, NumarTelefon=@NumarTelefon, Profesie=@Profesie, LocMunca=@LocMunca WHERE PacientID=@PacientID`);
 
-    // Update Email în Utilizatori
+    // 3. Update Email în Utilizatori
     const userIdResult = await transaction.request()
       .input('PacientID', sql.Int, id)
       .query(`SELECT UserID FROM Pacienti WHERE PacientID=@PacientID`);
@@ -298,7 +308,7 @@ app.put('/api/doctor/pacient/:id', async (req, res) => {
       .input('Email', sql.NVarChar(255), Email)
       .query(`UPDATE Utilizatori SET Email=@Email WHERE UserID=@UserID`);
 
-    // Update DateMedicale
+    // 4. Update DateMedicale
     await transaction.request()
       .input('PacientID', sql.Int, id)
       .input('IstoricMedical', sql.NVarChar(sql.MAX), IstoricMedical)
@@ -327,8 +337,8 @@ app.put('/api/doctor/pacient/:id', async (req, res) => {
           .query(`INSERT INTO istoric (istoricpacient, pacientid) VALUES (@istoricpacient, @pacientid)`);
       }
     }
-    
-      await transaction.commit();
+
+    await transaction.commit();
     res.json({ message: 'Pacient modificat cu succes!' });
   } catch (err) {
     await transaction.rollback();
