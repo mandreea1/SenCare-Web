@@ -141,14 +141,13 @@ export default function DoctorDashboard({ onLogout, user }) {
   return (
     <div>
       {/* Bara de navigare sus */}
-      <nav style={navStyles.navbar}>
-        {/* Stânga: Logo + Meniu */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={navStyles.logo}>
-            <FaUserMd />
-            SenCare
-          </div>
-          <div style={navStyles.navMenu}>
+              <nav className="doctor-navbar">
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div className="logo">
+              <FaUserMd />
+              SenCare
+            </div>
+          <div className="nav-menu">
             <Link
               to="/doctor/add-pacient"
               style={{
@@ -170,19 +169,15 @@ export default function DoctorDashboard({ onLogout, user }) {
           </div>
         </div>
         {/* Dreapta: Iconițe */}
-        <div style={navStyles.rightIcons}>
-          <button
-            style={navStyles.iconBtn}
-            title="Profil"
-            onClick={() => navigate('/doctor/profil')}
-          >
-            <FaUserCircle />
-          </button>
-          <button style={navStyles.iconBtn} title="Logout" onClick={onLogout}>
-            <FaSignOutAlt />
-          </button>
-        </div>
-      </nav>
+        <div className="right-icons">
+    <button className="icon-btn" title="Profil" onClick={() => navigate('/doctor/profil')}>
+      <FaUserCircle />
+    </button>
+    <button className="icon-btn" title="Logout" onClick={onLogout}>
+      <FaSignOutAlt />
+    </button>
+  </div>
+</nav>
 
       {/* Main Content */}
       <main style={mainStyles.main}>

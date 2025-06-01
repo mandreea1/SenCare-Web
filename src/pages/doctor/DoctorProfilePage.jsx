@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 export default function DoctorProfilePage() {
   const [doctor, setDoctor] = useState(null);
+  const [originalDoctor, setOriginalDoctor] = useState(null); // pentru reset
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [edit, setEdit] = useState(false);
@@ -19,6 +20,7 @@ export default function DoctorProfilePage() {
         if (!res.ok) throw new Error('Eroare la încărcarea profilului');
         const data = await res.json();
         setDoctor(data);
+        setOriginalDoctor(data); // salvează datele inițiale
       } catch (err) {
         setError('Nu s-au putut încărca datele.');
       } finally {
@@ -30,6 +32,20 @@ export default function DoctorProfilePage() {
 
   const handleChange = (e) => {
     setDoctor({ ...doctor, [e.target.name]: e.target.value });
+  };
+
+  const handleEdit = () => {
+    setOriginalDoctor(doctor); // salvează starea curentă la începutul editării
+    setEdit(true);
+    setSuccess('');
+    setError('');
+  };
+
+  const handleCancel = () => {
+    setDoctor(originalDoctor); // revine la datele inițiale
+    setEdit(false);
+    setSuccess('');
+    setError('');
   };
 
   const handleSave = async () => {
@@ -53,6 +69,7 @@ export default function DoctorProfilePage() {
       if (!res.ok) throw new Error('Eroare la salvare');
       setSuccess('Datele au fost salvate cu succes!');
       setEdit(false);
+      setOriginalDoctor(doctor); // actualizează datele originale după salvare
     } catch (err) {
       setError('Nu s-au putut salva datele.');
     } finally {
@@ -119,7 +136,7 @@ export default function DoctorProfilePage() {
             />
           </div>
           {!edit ? (
-            <button className="btn btn-primary" onClick={() => setEdit(true)}>
+            <button className="btn btn-primary" onClick={handleEdit}>
               Editează profilul
             </button>
           ) : (
@@ -128,7 +145,7 @@ export default function DoctorProfilePage() {
             </button>
           )}
           {edit && (
-            <button className="btn btn-secondary ms-2" onClick={() => setEdit(false)}>
+            <button className="btn btn-secondary ms-2" onClick={handleCancel}>
               Renunță
             </button>
           )}
