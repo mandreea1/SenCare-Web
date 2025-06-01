@@ -10,6 +10,7 @@ import AdaugaPacient from './pages/doctor/AdaugaPacient';
 import PacientiDoctor from './pages/doctor/PacientiDoctor';
 import PacientDetalii from './pages/doctor/PacientDetalii';
 import EditPacient from './pages/doctor/EditPacient';
+import DoctorProfilePage from './pages/doctor/DoctorProfilePage';
 import './App.css';
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route path="pacienti" element={<PacientiDoctor />} />
           <Route path="pacient/:id" element={<PacientDetalii />} />
           <Route path="pacient/:id/edit" element={<EditPacient />} />
+          <Route path="profil" element={<DoctorProfilePage />} /> 
         </Route>
 
         <Route path="/admin" element={<AdminDashboard />} />

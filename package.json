@@ -10,6 +10,7 @@
     "ajv-formats": "^3.0.1",
     "axios": "^1.6.7",
     "bcrypt": "^6.0.0",
+    "bootstrap": "^5.3.6",
     "concurrently": "^8.2.2",
     "mssql": "^11.0.1",
     "react": "^18.2.0",

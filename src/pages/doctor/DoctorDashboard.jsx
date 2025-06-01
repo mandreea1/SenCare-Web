@@ -1,114 +1,110 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { FaUserMd, FaSignOutAlt } from 'react-icons/fa';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { FaUserMd, FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
 
-
-const sidebarStyles = {
-  sidebar: {
-    width: 220,
-    minHeight: '100vh',
-    background: 'linear-gradient(180deg, #6a6fd5 0%, #3840a7 100%)',
-    color: '#fff',
-    padding: '32px 0',
+const navStyles = {
+  navbar: {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    position: 'fixed',
-    left: 0,
+    justifyContent: 'space-between',
+    background: 'linear-gradient(90deg, #6a6fd5 0%, #3840a7 100%)',
+    color: '#fff',
+    padding: '0 32px',
+    height: 70,
+    position: 'sticky',
     top: 0,
-    boxShadow: '2px 0 12px rgba(60,60,120,0.08)',
-    zIndex: 10,
+    zIndex: 100,
+    boxShadow: '0 2px 8px rgba(60,60,120,0.07)',
+  },
+  navMenu: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 18,
+    marginLeft: 32, // pentru a împinge meniul puțin spre dreapta față de logo
+  },
+  navLink: {
+    color: '#fff',
+    textDecoration: 'none',
+    fontWeight: 600,
+    fontSize: 18,
+    padding: '8px 18px',
+    borderRadius: 8,
+    transition: 'background 0.18s, color 0.18s',
+  },
+  navLinkActive: {
+    background: '#fff',
+    color: '#3840a7',
   },
   logo: {
     fontSize: 28,
     fontWeight: 700,
-    marginBottom: 40,
     letterSpacing: 1,
-  },
-  nav: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 18, // mai mult spațiu între butoane
-    marginTop: 40,
-  },
-  navItem: {
-    width: '90%',
-    margin: '0 auto',
-    padding: '16px 24px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 14,
-    fontSize: 18,
-    fontWeight: 600,
-    color: '#3840a7',
-    background: '#fff',
-    border: 'none',
-    borderRadius: 10,
-    cursor: 'pointer',
-    transition: 'background 0.18s, color 0.18s',
-    textDecoration: 'none',
-    boxShadow: '0 2px 8px rgba(60,60,120,0.07)',
-  },
-  navItemActive: {
-    background: '#3840a7',
-    color: '#fff',
-  },
-  spacer: {
-    flex: 1,
-  },
-  logout: {
-    marginTop: 32,
-    padding: '12px 32px',
-    background: 'rgba(255,255,255,0.10)',
-    border: 'none',
-    borderRadius: 8,
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 500,
-    cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     gap: 10,
-  }
+    marginRight: 16, // logo mai spre stânga
+  },
+  rightIcons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 18,
+  },
+  iconBtn: {
+    background: 'none',
+    border: 'none',
+    color: '#fff',
+    fontSize: 26,
+    cursor: 'pointer',
+    padding: 0,
+  },
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    background: 'rgba(0,0,0,0.25)',
+    zIndex: 999,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modal: {
+    background: '#fff',
+    borderRadius: 12,
+    padding: 32,
+    minWidth: 320,
+    boxShadow: '0 8px 32px rgba(60,60,120,0.18)',
+    color: '#222',
+    position: 'relative',
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
+    background: 'none',
+    border: 'none',
+    fontSize: 22,
+    cursor: 'pointer',
+    color: '#3840a7',
+  },
 };
 
 const mainStyles = {
   main: {
-    marginLeft: 220,
     padding: '48px 40px',
     minHeight: '100vh',
     background: '#f8f8fa',
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 40,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: 700,
-    marginBottom: 32,
-    color: '#222',
-  },
-  info: {
-    background: '#fff',
-    borderRadius: 16,
-    boxShadow: '0 2px 12px rgba(60,60,120,0.07)',
-    padding: 32,
-    maxWidth: 420,
-    marginBottom: 32,
-    minWidth: 320,
-    height: 'fit-content'
-  },
-  outlet: {
-    flex: 1,
-    minWidth: 0,
-  }
 };
 
 export default function DoctorDashboard({ onLogout, user }) {
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isDashboard = location.pathname === '/doctor' || location.pathname === '/doctor/';
 
   useEffect(() => {
     async function fetchDoctorData() {
@@ -122,8 +118,6 @@ export default function DoctorDashboard({ onLogout, user }) {
           setError('Nu există userId.');
           return;
         }
-        // Folosește endpoint-ul corect!
-        
         const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
         const res = await fetch(`${BACKEND_URL}/api/doctor/profile?userId=${userId}`);
         if (!res.ok) throw new Error('Eroare la profil doctor');
@@ -144,85 +138,75 @@ export default function DoctorDashboard({ onLogout, user }) {
     fetchDoctorData();
   }, [user]);
 
-  const location = useLocation();
-  const isDashboard = location.pathname === "/doctor" || location.pathname === "/doctor/";
-
   return (
-    <div style={{ display: 'flex' }}>
-      {/* Sidebar */}
-      <aside style={sidebarStyles.sidebar}>
-        <div style={sidebarStyles.logo}>
-          <FaUserMd style={{ marginRight: 10 }} />
-          SenCare
+    <div>
+      {/* Bara de navigare sus */}
+      <nav style={navStyles.navbar}>
+        {/* Stânga: Logo + Meniu */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={navStyles.logo}>
+            <FaUserMd />
+            SenCare
+          </div>
+          <div style={navStyles.navMenu}>
+            <Link
+              to="/doctor/add-pacient"
+              style={{
+                ...navStyles.navLink,
+                ...(location.pathname === '/doctor/add-pacient' ? navStyles.navLinkActive : {}),
+              }}
+            >
+              Adaugă pacient
+            </Link>
+            <Link
+              to="/doctor/pacienti"
+              style={{
+                ...navStyles.navLink,
+                ...(location.pathname === '/doctor/pacienti' ? navStyles.navLinkActive : {}),
+              }}
+            >
+              Vezi pacienții mei
+            </Link>
+          </div>
         </div>
-        <nav style={sidebarStyles.nav}>
-          <Link
-            to="/doctor"
-            style={{
-              ...sidebarStyles.navItem,
-              ...(isDashboard ? sidebarStyles.navItemActive : {})
-            }}
+        {/* Dreapta: Iconițe */}
+        <div style={navStyles.rightIcons}>
+          <button
+            style={navStyles.iconBtn}
+            title="Profil"
+            onClick={() => navigate('/doctor/profil')}
           >
-            Dashboard
-          </Link>
-          <Link
-            to="/doctor/add-pacient"
-            style={{
-              ...sidebarStyles.navItem,
-              ...(location.pathname === "/doctor/add-pacient" ? sidebarStyles.navItemActive : {})
-            }}
-          >
-            Adaugă pacient
-          </Link>
-          <Link
-            to="/doctor/pacienti"
-            style={{
-              ...sidebarStyles.navItem,
-              ...(location.pathname === "/doctor/pacienti" ? sidebarStyles.navItemActive : {})
-            }}
-          >
-            Vezi pacienții mei
-          </Link>
-        </nav>
-        <div style={sidebarStyles.spacer} />
-        <button style={sidebarStyles.logout} onClick={onLogout}>
-          <FaSignOutAlt /> Logout
-        </button>
-      </aside>
+            <FaUserCircle />
+          </button>
+          <button style={navStyles.iconBtn} title="Logout" onClick={onLogout}>
+            <FaSignOutAlt />
+          </button>
+        </div>
+      </nav>
+
       {/* Main Content */}
       <main style={mainStyles.main}>
         {isDashboard && (
-          <div style={mainStyles.info}>
-            <div style={mainStyles.title}>Datele medicului</div>
+          <div className="bg-white rounded shadow-sm p-4 mb-4" style={{ maxWidth: 420 }}>
+            <div className="fs-2 fw-bold mb-3">Datele medicului</div>
             {loading && <div>Se încarcă datele...</div>}
-            {error && <div style={{ color: 'red' }}>{error}</div>}
+            {error && <div className="text-danger">{error}</div>}
             {!loading && doctor && (
               <>
-                <div style={{ fontSize: 22, fontWeight: 600, marginBottom: 8 }}>
+                <div className="fs-4 fw-semibold mb-2">
                   {doctor.Nume} {doctor.Prenume}
                 </div>
-                <div style={{ color: '#6a6fd5', fontWeight: 500, marginBottom: 4 }}>
+                <div className="text-primary fw-medium mb-1">
                   Specializare: {doctor.Specializare}
                 </div>
-                <div style={{ color: '#888', marginBottom: 4 }}>
-                  Telefon: {doctor.Telefon}
-                </div>
-                <div style={{ color: '#444', fontSize: 16 }}>
-                  Email: {doctor.Email}
-                </div>
-                <div style={{ color: '#444', fontSize: 16, marginTop: 8 }}>
-                  UserID: {doctor.UserID}
-                </div>
-                <div style={{ color: '#444', fontSize: 16, marginTop: 8 }}>
-                  MedicID: {doctor.MedicID}
-                </div>
+                <div className="text-muted mb-1">Telefon: {doctor.Telefon}</div>
+                <div className="text-secondary mb-1">Email: {doctor.Email}</div>
+                {/* UserID și MedicID eliminate */}
               </>
             )}
           </div>
         )}
-        <div style={mainStyles.outlet}>
-          <Outlet />
-        </div>
+        <Outlet />
       </main>
     </div>
   );

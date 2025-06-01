@@ -393,6 +393,47 @@ app.get('/api/doctor/profile', async (req, res) => {
   }
 });
 
+app.put('/api/doctor/profile', async (req, res) => {
+  const { userId, Nume, Prenume, Specializare, Telefon, Email } = req.body;
+  if (!userId) {
+    return res.status(400).json({ error: 'Lipsește userId.' });
+  }
+
+  const transaction = new sql.Transaction();
+  try {
+    await transaction.begin();
+
+    // Actualizează tabelul Medici
+    await transaction.request()
+      .input('Nume', sql.NVarChar, Nume)
+      .input('Prenume', sql.NVarChar, Prenume)
+      .input('Specializare', sql.NVarChar, Specializare)
+      .input('Telefon', sql.NVarChar, Telefon)
+      .input('UserID', sql.Int, userId)
+      .query(`
+        UPDATE Medici
+        SET Nume = @Nume, Prenume = @Prenume, Specializare = @Specializare, Telefon = @Telefon
+        WHERE UserID = @UserID
+      `);
+
+    // Actualizează emailul în tabelul Utilizatori
+    await transaction.request()
+      .input('Email', sql.NVarChar, Email)
+      .input('UserID', sql.Int, userId)
+      .query(`
+        UPDATE Utilizatori
+        SET Email = @Email
+        WHERE UserID = @UserID
+      `);
+
+    await transaction.commit();
+    res.json({ message: 'Profil actualizat cu succes!' });
+  } catch (err) {
+    await transaction.rollback();
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });
