@@ -56,13 +56,9 @@ function VizualizarePacient() {
           <div className="patient-details-row"><b>Alergii:</b> {pacient.Alergii}</div>
           <div className="patient-details-row"><b>Consultații cardiologice:</b> {pacient.ConsultatiiCardiologice}</div>
         </div>
-        <button
-          className="action-select"
-          style={{ marginTop: 18 }}
-          onClick={() => navigate(-1)}
-        >
-          Înapoi la pacienți
-        </button>
+        <button type="button" className="btn-primary" onClick={() => navigate(-1)}>
+  Înapoi la pacienți
+</button>
       </div>
     </div>
   );

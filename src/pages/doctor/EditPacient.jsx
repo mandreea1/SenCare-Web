@@ -151,9 +151,9 @@ function EditarePacient() {
           />
         </div>
       </div>
-      <button type="submit" className="action-select" style={{ marginTop: 18 }}>
-        Salvează modificările
-      </button>
+      <button type="submit" className="btn-primary">
+  Salvează modificările
+</button>
       {mesaj && (
         <div className="form-message" style={{ color: mesaj.includes('succes') ? 'green' : 'red' }}>
           {mesaj}
