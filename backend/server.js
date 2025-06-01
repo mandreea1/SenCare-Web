@@ -484,6 +484,23 @@ app.get('/api/doctor/pacient/:id/datefiziologice', async (req, res) => {
   }
 });
 
+app.get('/api/doctor/pacient/:id/ecg-ultim', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, id)
+      .query(`
+        SELECT TOP 1 ECG, Data_timp
+        FROM DateFiziologice
+        WHERE PacientID = @PacientID AND ECG IS NOT NULL AND ECG <> ''
+        ORDER BY Data_timp DESC
+      `);
+    res.json(result.recordset[0] || {});
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });

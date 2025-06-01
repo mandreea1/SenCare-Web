@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import GraficeEvolutie from './GraficeEvolutie';
+import EcgChart from './EcgChart';
 import axios from 'axios';
 
 function FisaMedicalaPacient() {
@@ -74,6 +75,7 @@ function FisaMedicalaPacient() {
           <b>II. Grafice evoluție</b>
           <div style={{ marginTop: 16 }}>
             <GraficeEvolutie id={pacient.PacientID || pacient.id || id} />
+            <EcgChart ecgString={ecgStringDinBackendSauUltimaMasurare} />
           </div>
         </div>
         <div className="fisa-section">
