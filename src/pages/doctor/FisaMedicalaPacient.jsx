@@ -10,6 +10,7 @@ function FisaMedicalaPacient() {
   const [istoric, setIstoric] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mesaj, setMesaj] = useState('');
+  const [ecgStringDinBackendSauUltimaMasurare, setEcgStringDinBackendSauUltimaMasurare] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +40,23 @@ function FisaMedicalaPacient() {
     }
     fetchIstoric();
   }, [id]);
+
+useEffect(() => {
+  async function fetchEcg() {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/ecg-ultim`);
+      console.log('ECG response:', res.data);
+      // Transformă stringul în array de numere
+      const ecgArray = res.data?.ECG
+        ? res.data.ECG.split(',').map(val => Number(val.trim()))
+        : [];
+      setEcgStringDinBackendSauUltimaMasurare(ecgArray);
+    } catch (err) {
+      setEcgStringDinBackendSauUltimaMasurare([]);
+    }
+  }
+  fetchEcg();
+}, [id]);
 
   if (loading) return <div className="fisa-medicala-container">Se încarcă...</div>;
   if (mesaj) return <div className="fisa-medicala-container" style={{ color: 'red' }}>{mesaj}</div>;

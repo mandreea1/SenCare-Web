@@ -4,11 +4,10 @@ import {
 } from 'recharts';
 
 function EcgChart({ ecgString }) {
-  // Transformă stringul în array de obiecte { idx, value }
-  const data = (ecgString || '')
-    .split(',')
-    .map((v, idx) => ({ idx, value: Number(v) }))
-    .filter(d => !isNaN(d.value));
+  // Dacă ecgString e deja array, folosește-l direct
+  const data = Array.isArray(ecgString)
+    ? ecgString.map((v, idx) => ({ idx, value: Number(v) }))
+    : [];
 
   if (!data.length) return <div>Nu există date ECG.</div>;
 
