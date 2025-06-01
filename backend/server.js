@@ -460,6 +460,18 @@ app.put('/api/doctor/profile', async (req, res) => {
   }
 });
 
+app.get('/api/doctor/pacient/:id/istoric', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const istoric = await new sql.Request()
+      .input('PacientID', sql.Int, id)
+      .query(`SELECT istoricpacient FROM istoric WHERE pacientid = @PacientID`);
+    res.json(istoric.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });

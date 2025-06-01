@@ -5,6 +5,7 @@ import axios from 'axios';
 function FisaMedicalaPacient() {
   const { id } = useParams();
   const [pacient, setPacient] = useState(null);
+  const [istoric, setIstoric] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mesaj, setMesaj] = useState('');
   const navigate = useNavigate();
@@ -25,38 +26,59 @@ function FisaMedicalaPacient() {
     fetchPacient();
   }, [id]);
 
+  useEffect(() => {
+    async function fetchIstoric() {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/istoric`);
+        setIstoric(res.data);
+      } catch (err) {
+        // poți ignora eroarea sau afișa un mesaj
+      }
+    }
+    fetchIstoric();
+  }, [id]);
+
   if (loading) return <div className="fisa-medicala-container">Se încarcă...</div>;
   if (mesaj) return <div className="fisa-medicala-container" style={{ color: 'red' }}>{mesaj}</div>;
   if (!pacient) return <div className="fisa-medicala-container">Nu există fișă medicală pentru acest pacient.</div>;
 
   return (
-  <div className="fisa-medicala-container">
-    <div className="fisa-medicala-card">
-      <div className="fisa-header">
-        <h2>FIȘĂ MEDICALĂ SINTETICĂ</h2>
-      </div>
-      <div className="fisa-section">
-        <div><b>Nume:</b> {pacient.Nume}</div>
-        <div><b>Prenume:</b> {pacient.Prenume}</div>
-        <div><b>CNP:</b> {pacient.CNP}</div>
-        <div><b>Adresă:</b> {pacient.Adresa}</div>
-        <div><b>Vârstă:</b> {pacient.Varsta}</div>
-        <div><b>Profesie:</b> {pacient.Profesie}</div>
-        <div><b>Loc de muncă:</b> {pacient.LocMunca}</div>
-        <div><b>Istoric medical:</b> {pacient.IstoricMedical}</div>
-        <div><b>Alergii:</b> {pacient.Alergii}</div>
-        <div><b>Consultații cardiologice:</b> {pacient.ConsultatiiCardiologice}</div>
-      </div>
+    <div className="fisa-medicala-container">
+      <div className="fisa-medicala-card">
+        <div className="fisa-header">
+          <h2>FIȘĂ MEDICALĂ</h2>
+        </div>
         <div className="fisa-section">
-          <b>I. Anamneză</b>
+          <div><b>Nume:</b> {pacient.Nume}</div>
+          <div><b>Prenume:</b> {pacient.Prenume}</div>
+          <div><b>CNP:</b> {pacient.CNP}</div>
+          <div><b>Adresă:</b> {pacient.Adresa}</div>
+          <div><b>Vârstă:</b> {pacient.Varsta}</div>
+          <div><b>Profesie:</b> {pacient.Profesie}</div>
+          <div><b>Loc de muncă:</b> {pacient.LocMunca}</div>
+          <div><b>Istoric medical:</b> {pacient.IstoricMedical}</div>
+          <div><b>Alergii:</b> {pacient.Alergii}</div>
+          <div><b>Consultații cardiologice:</b> {pacient.ConsultatiiCardiologice}</div>
+        </div>
+        <div className="fisa-section">
+          <b>I. Istoric</b>
+          {istoric.length === 0 && <div className="fisa-field"><i>Nu există istoric.</i></div>}
+          {istoric.map((item, idx) => (
+            <div className="fisa-field" key={idx}>
+              {item.istoricpacient}
+            </div>
+          ))}
+        </div>
+        <div className="fisa-section">
+          <b>II. Anamneză</b>
           <div className="fisa-field">{pacient.Anamneza || <i>-</i>}</div>
         </div>
         <div className="fisa-section">
-          <b>II. Diagnostic medical cu specificație cod (ICD 10)</b>
+          <b>III. Diagnostic medical cu specificație cod (ICD 10)</b>
           <div className="fisa-field">{pacient.Diagnostic || <i>-</i>}</div>
         </div>
         <div className="fisa-section">
-          <b>III. Tratamente/monitorizări și recomandări</b>
+          <b>IV. Tratamente/monitorizări și recomandări</b>
           <table className="fisa-tabel">
             <thead>
               <tr>
