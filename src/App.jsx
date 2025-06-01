@@ -11,6 +11,7 @@ import PacientiDoctor from './pages/doctor/PacientiDoctor';
 import PacientDetalii from './pages/doctor/PacientDetalii';
 import EditPacient from './pages/doctor/EditPacient';
 import DoctorProfilePage from './pages/doctor/DoctorProfilePage';
+import FisaMedicalaPacient from './pages/doctor/FisaMedicalaPacient';
 import './App.css';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
           <Route path="pacient/:id" element={<PacientDetalii />} />
           <Route path="pacient/:id/edit" element={<EditPacient />} />
           <Route path="profil" element={<DoctorProfilePage />} /> 
+          <Route path="/doctor/pacient/:id/fisa" element={<FisaMedicalaPacient />} />
         </Route>
 
         <Route path="/admin" element={<AdminDashboard />} />

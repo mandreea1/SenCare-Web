@@ -507,3 +507,100 @@ input, textarea {
     width: 100%;
   }
 }
+
+.fisa-medicala-container {
+  max-width: 800px;
+  margin: 32px auto;
+  padding: 0 8px;
+}
+
+.fisa-medicala-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #dbeafe;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fisa-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.fisa-header h2 {
+  color: #2D68F8;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.fisa-section {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fisa-field {
+  background: #f6f7fb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-height: 32px;
+  font-size: 1rem;
+}
+
+.fisa-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  background: #f9faff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fisa-tabel th, .fisa-tabel td {
+  border: 1px solid #e3e3e3;
+  padding: 8px 6px;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.fisa-tabel th {
+  background: #eaf2fd;
+  color: #2D68F8;
+  font-weight: 700;
+}
+
+.btn-primary {
+  background: linear-gradient(120deg, #2D68F8 0%, #5fa8f5 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 0;
+  font-weight: 600;
+  font-size: 18px;
+  cursor: pointer;
+  width: 240px;
+  align-self: center;
+}
+
+@media (max-width: 700px) {
+  .fisa-medicala-card {
+    padding: 12px 4px;
+    border-radius: 10px;
+    gap: 14px;
+  }
+  .fisa-header h2 {
+    font-size: 1.2rem;
+  }
+  .btn-primary {
+    width: 100%;
+    font-size: 1rem;
+  }
+  .fisa-tabel th, .fisa-tabel td {
+    font-size: 0.97rem;
+    padding: 6px 2px;
+  }
+}

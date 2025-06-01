@@ -23,6 +23,9 @@ function PacientiDoctor() {
   }, [doctorEmail]);
 
   const handleAction = (id, action) => {
+     if (action === 'fisa') {
+    navigate(`/doctor/pacient/${id}/fisa`);
+  } else 
     if (action === 'vizualizeaza') {
       navigate(`/doctor/pacient/${id}`);
     } else if (action === 'modifica') {
@@ -65,6 +68,7 @@ function PacientiDoctor() {
                 <option value="vizualizeaza">Vizualizare date Pacient</option>
                 <option value="modifica">Modifică datele pacientului</option>
                 <option value="sterge">Șterge pacientul</option>
+                <option value="fisa">Fișă medicală</option>
               </select>
             </div>
           </div>

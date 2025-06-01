@@ -306,7 +306,29 @@ app.put('/api/doctor/pacient/:id', async (req, res) => {
       .input('ConsultatiiCardiologice', sql.NVarChar(sql.MAX), ConsultatiiCardiologice)
       .query(`UPDATE DateMedicale SET IstoricMedical=@IstoricMedical, Alergii=@Alergii, ConsultatiiCardiologice=@ConsultatiiCardiologice WHERE PacientID=@PacientID`);
 
-    await transaction.commit();
+    // 5. INSERARE ÎN ISTORIC cu valorile vechi dacă s-au modificat
+    if (vechiDate) {
+      if (IstoricMedical !== undefined && IstoricMedical !== vechiDate.IstoricMedical && vechiDate.IstoricMedical) {
+        await transaction.request()
+          .input('istoricpacient', sql.NVarChar(sql.MAX), vechiDate.IstoricMedical)
+          .input('pacientid', sql.Int, id)
+          .query(`INSERT INTO istoric (istoricpacient, pacientid) VALUES (@istoricpacient, @pacientid)`);
+      }
+      if (Alergii !== undefined && Alergii !== vechiDate.Alergii && vechiDate.Alergii) {
+        await transaction.request()
+          .input('istoricpacient', sql.NVarChar(sql.MAX), vechiDate.Alergii)
+          .input('pacientid', sql.Int, id)
+          .query(`INSERT INTO istoric (istoricpacient, pacientid) VALUES (@istoricpacient, @pacientid)`);
+      }
+      if (ConsultatiiCardiologice !== undefined && ConsultatiiCardiologice !== vechiDate.ConsultatiiCardiologice && vechiDate.ConsultatiiCardiologice) {
+        await transaction.request()
+          .input('istoricpacient', sql.NVarChar(sql.MAX), vechiDate.ConsultatiiCardiologice)
+          .input('pacientid', sql.Int, id)
+          .query(`INSERT INTO istoric (istoricpacient, pacientid) VALUES (@istoricpacient, @pacientid)`);
+      }
+    }
+    
+      await transaction.commit();
     res.json({ message: 'Pacient modificat cu succes!' });
   } catch (err) {
     await transaction.rollback();
