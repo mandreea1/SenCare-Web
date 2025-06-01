@@ -12,6 +12,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: #f5f5f5;
   color: #333;
+  overflow-x: hidden;
 }
 
 .App {
@@ -54,7 +55,9 @@ input, textarea {
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
-} 
+}
+
+/* Responsive navbar și pagini */
 .doctor-navbar {
   display: flex;
   align-items: center;
@@ -62,16 +65,17 @@ input, textarea {
   background: linear-gradient(90deg, #6a6fd5 0%, #3840a7 100%);
   color: #fff;
   padding: 0 16px;
-  height: 70px;
+  min-height: 64px;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(60,60,120,0.07);
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .doctor-navbar .logo {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -101,13 +105,30 @@ input, textarea {
   padding: 0;
 }
 
+/* Link-uri navbar */
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 18px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  transition: background 0.18s, color 0.18s;
+}
+
+.nav-link.active {
+  background: #fff;
+  color: #3840a7;
+}
+
 /* Responsive pentru telefon */
 @media (max-width: 700px) {
   .doctor-navbar {
     flex-direction: column;
-    height: auto;
-    padding: 10px 4px;
     align-items: stretch;
+    padding: 10px 4px;
+    min-height: unset;
+    width: 100%;
   }
   .doctor-navbar .logo {
     justify-content: center;
@@ -118,9 +139,29 @@ input, textarea {
     justify-content: center;
     margin: 8px 0;
     gap: 8px;
+    width: 100%;
   }
   .doctor-navbar .right-icons {
     justify-content: center;
     margin-bottom: 8px;
+    width: 100%;
+  }
+  .nav-link {
+    font-size: 16px;
+    padding: 8px 8px;
+  }
+}
+
+/* Responsive pentru conținutul paginilor */
+@media (max-width: 700px) {
+  main, .main-content, .container {
+    padding: 12px !important;
+    width: 100% !important;
+  }
+  .bg-white, .rounded, .shadow-sm, .p-4, .mb-4 {
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box;
   }
 }
