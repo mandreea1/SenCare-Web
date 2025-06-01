@@ -472,6 +472,18 @@ app.get('/api/doctor/pacient/:id/istoric', async (req, res) => {
   }
 });
 
+app.get('/api/doctor/pacient/:id/datefiziologice', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, id)
+      .query(`SELECT IdMasurare, Puls, Temperatura, Umiditate, Data_timp FROM DateFiziologice WHERE PacientID = @PacientID ORDER BY Data_timp ASC`);
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });

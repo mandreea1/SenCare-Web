@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import GraficeEvolutie from './GraficeEvolutie';
 import axios from 'axios';
 
 function FisaMedicalaPacient() {
@@ -70,8 +71,10 @@ function FisaMedicalaPacient() {
           ))}
         </div>
         <div className="fisa-section">
-          <b>II. Anamneză</b>
-          <div className="fisa-field">{pacient.Anamneza || <i>-</i>}</div>
+          <b>II. Grafice evoluție</b>
+          <div style={{ marginTop: 16 }}>
+            <GraficeEvolutie id={pacient.PacientID || pacient.id || id} />
+          </div>
         </div>
         <div className="fisa-section">
           <b>III. Diagnostic medical cu specificație cod (ICD 10)</b>
