@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function PacientiDoctor() {
   const doctorEmail = localStorage.getItem('email');
   const [pacienti, setPacienti] = useState([]);
   const [mesaj, setMesaj] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPacienti = async () => {
@@ -21,44 +22,54 @@ function PacientiDoctor() {
     fetchPacienti();
   }, [doctorEmail]);
 
-  const handleSterge = async (id) => {
-    if (!window.confirm('Sigur vrei să ștergi acest pacient?')) return;
-    try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`);
-      setPacienti(pacienti.filter(p => p.PacientID !== id));
-    } catch (err) {
-      setMesaj('Eroare la ștergere: ' + (err.response?.data?.error || err.message));
+  const handleAction = (id, action) => {
+    if (action === 'vizualizeaza') {
+      navigate(`/doctor/pacient/${id}`);
+    } else if (action === 'modifica') {
+      navigate(`/doctor/pacient/${id}/edit`);
+    } else if (action === 'sterge') {
+      if (window.confirm('Sigur vrei să ștergi acest pacient?')) {
+        axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`)
+          .then(() => setPacienti(pacienti.filter(p => p.PacientID !== id)))
+          .catch(err => setMesaj('Eroare la ștergere: ' + (err.response?.data?.error || err.message)));
+      }
     }
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: '2rem auto' }}>
-      <h2>Pacienții mei</h2>
+    <div className="my-patients-list-container">
+      <h2 className="my-patients-title">Pacienții mei</h2>
       {mesaj && <div style={{ color: 'red' }}>{mesaj}</div>}
-      <table border="1" cellPadding={6} style={{ width: '100%', marginBottom: 20 }}>
-        <thead>
-          <tr>
-            <th>Nume</th>
-            <th>Prenume</th>
-            <th>Email</th>
-            <th>Acțiuni</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pacienti.map(p => (
-            <tr key={p.PacientID}>
-              <td>{p.Nume}</td>
-              <td>{p.Prenume}</td>
-              <td>{p.Email}</td>
-              <td>
-                <Link to={`/doctor/pacient/${p.PacientID}`}>Vizualizează</Link> |{' '}
-                <Link to={`/doctor/pacient/${p.PacientID}/edit`}>Modifică</Link> |{' '}
-                <button onClick={() => handleSterge(p.PacientID)}>Șterge</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="my-patients-list">
+        {pacienti.map(p => (
+          <div className="patient-card" key={p.PacientID}>
+            <div className="patient-avatar">
+              <span>{(p.Nume || '').charAt(0)}</span>
+            </div>
+            <div className="patient-info">
+              <div className="patient-name">{p.Nume} {p.Prenume}</div>
+              <div className="patient-details">
+                <span>{p.Email}</span>
+              </div>
+            </div>
+            <div className="patient-actions">
+              <select
+                className="action-select"
+                defaultValue=""
+                onChange={e => {
+                  if (e.target.value) handleAction(p.PacientID, e.target.value);
+                  e.target.value = '';
+                }}
+              >
+                <option value="" disabled>Acțiuni</option>
+                <option value="vizualizeaza">Vizualizare date Pacient</option>
+                <option value="modifica">Modifică datele pacientului</option>
+                <option value="sterge">Șterge pacientul</option>
+              </select>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

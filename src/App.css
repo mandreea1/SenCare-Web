@@ -75,8 +75,9 @@ input, textarea {
 }
 
 .doctor-navbar .logo {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
+  margin-bottom: 2px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -131,9 +132,12 @@ input, textarea {
     width: 100%;
   }
   .doctor-navbar .logo {
-    justify-content: center;
-    font-size: 18px;
-    margin-bottom: 8px;
+     display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
   }
   .doctor-navbar .nav-menu {
     justify-content: center;
@@ -163,5 +167,312 @@ input, textarea {
     margin-bottom: 12px !important;
     width: 100% !important;
     box-sizing: border-box;
+  }
+}
+.add-pacient-form {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #dbeafe;
+  padding: 32px;
+  max-width: 700px;
+  margin: 32px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.add-pacient-form .form-title {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #222;
+  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  text-shadow: 0 2px 8px rgba(60,60,120,0.07);
+}
+
+.add-pacient-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+.add-pacient-form .form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-pacient-form label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #3840a7;
+}
+
+.add-pacient-form input,
+.add-pacient-form textarea {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #cfd8dc;
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 8px;
+  background: #fafbff;
+  transition: border 0.2s;
+}
+
+.add-pacient-form textarea {
+  min-height: 48px;
+}
+
+.add-pacient-form button {
+  background: linear-gradient(90deg, #6a6fd5 0%, #3840a7 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 0;
+  font-weight: 600;
+  font-size: 18px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background 0.2s;
+  width: 240px;
+  align-self: center;
+}
+
+.add-pacient-form .form-message {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* Responsive pentru mobil */
+@media (max-width: 700px) {
+  .add-pacient-form {
+    padding: 14px;
+    margin: 12px 4px;
+    max-width: 100%;
+    gap: 10px;
+  }
+  .add-pacient-form .form-title {
+    font-size: 1.3rem;
+  }
+  .add-pacient-form .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .add-pacient-form button {
+    width: 100%;
+  }
+}
+
+.my-patients-list-container {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #dbeafe;
+  padding: 24px;
+  max-width: 700px;
+  margin: 32px auto;
+}
+
+.my-patients-title {
+  color: #3840a7;
+  margin-bottom: 18px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.my-patients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.patient-card {
+  display: flex;
+  align-items: center;
+  background: #f6f7fb;
+  border-radius: 12px;
+  padding: 16px 14px;
+  box-shadow: 0 1px 6px #dbeafe55;
+  gap: 16px;
+  transition: box-shadow 0.18s;
+}
+
+.patient-card:hover {
+  box-shadow: 0 4px 16px #b3baff44;
+}
+
+.patient-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #6a6fd5;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.patient-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.patient-name {
+  font-weight: 700;
+  color: #3840a7;
+  font-size: 1.1rem;
+}
+
+.patient-details {
+  font-size: 0.97rem;
+  color: #555;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.patient-actions {
+  margin-left: 8px;
+}
+
+.action-select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #cfd8dc;
+  background: #f5f6fa;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* Responsive pentru mobil */
+@media (max-width: 700px) {
+  .my-patients-list-container {
+    padding: 8px;
+    margin: 12px 2px;
+    border-radius: 10px;
+    max-width: 100%;
+  }
+  .my-patients-title {
+    font-size: 1.3rem;
+  }
+  .patient-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 6px;
+  }
+  .patient-avatar {
+    margin: 0 auto 6px auto;
+  }
+  .patient-details {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .patient-actions {
+    margin-left: 0;
+    margin-top: 6px;
+  }
+  .action-select {
+    width: 100%;
+  }
+}
+
+.edit-pacient-form {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #dbeafe;
+  padding: 32px;
+  max-width: 700px;
+  margin: 32px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edit-pacient-form .form-title {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #3840a7;
+  font-weight: 800;
+  font-size: 2rem;
+}
+
+.edit-pacient-form .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+.edit-pacient-form .form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-pacient-form label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #3840a7;
+}
+
+.edit-pacient-form input,
+.edit-pacient-form textarea {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #cfd8dc;
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 8px;
+  background: #fafbff;
+  transition: border 0.2s;
+}
+
+.edit-pacient-form textarea {
+  min-height: 48px;
+}
+
+.edit-pacient-form .form-message {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* Responsive pentru mobil */
+@media (max-width: 700px) {
+  .edit-pacient-form {
+    padding: 14px;
+    margin: 12px 4px;
+    max-width: 100%;
+    gap: 10px;
+  }
+  .edit-pacient-form .form-title {
+    font-size: 1.3rem;
+  }
+  .edit-pacient-form .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.patient-details-row {
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: #333;
+  word-break: break-word;
+}
+@media (max-width: 700px) {
+  .patient-details-row {
+    font-size: 0.97rem;
+    margin-bottom: 6px;
   }
 }
