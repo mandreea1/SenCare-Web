@@ -568,15 +568,35 @@ app.post('/api/doctor/pacient/:id/valorinormale', async (req, res) => {
   }
 });
 
-// POST - Adaugă o alarmă nouă și înregistrează în istoric
+app.get('/api/doctor/pacient/:id/alarme', async (req, res) => {
+  try {
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, req.params.id)
+      .query(`
+        SELECT AlarmaID, PacientID, TipAlarma, Descriere
+        FROM AlarmeAvertizari 
+        WHERE PacientID = @PacientID
+      `);
+    
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare la obținerea alarmelor:', err);
+    res.status(500).json({ error: 'Eroare la obținerea alarmelor' });
+  }
+});
+
+// POST - Adaugă o alarmă nouă și salvează în istoric
 app.post('/api/doctor/pacient/:id/alarme', async (req, res) => {
-  const { id } = req.params;
-  const { TipAlarma, Descriere } = req.body;
+  const transaction = new sql.Transaction();
   
   try {
-    // Adaugă alarma
-    const resultAlarma = await new sql.Request()
-      .input('PacientID', sql.Int, id)
+    await transaction.begin();
+    
+    const { TipAlarma, Descriere } = req.body;
+    
+    // Adaugă alarma și obține ID-ul
+    const resultAlarma = await new sql.Request(transaction)
+      .input('PacientID', sql.Int, req.params.id)
       .input('TipAlarma', sql.NVarChar(50), TipAlarma)
       .input('Descriere', sql.NVarChar(sql.MAX), Descriere)
       .query(`
@@ -584,36 +604,40 @@ app.post('/api/doctor/pacient/:id/alarme', async (req, res) => {
         OUTPUT INSERTED.AlarmaID
         VALUES (@PacientID, @TipAlarma, @Descriere)
       `);
-    
+
     const alarmaId = resultAlarma.recordset[0].AlarmaID;
 
-    // Înregistrează în istoric
-    await new sql.Request()
+    // Salvează în istoric
+    await new sql.Request(transaction)
       .input('AlarmaID', sql.Int, alarmaId)
-      .input('PacientID', sql.Int, id)
+      .input('PacientID', sql.Int, req.params.id)
       .input('TipAlarma', sql.NVarChar(50), TipAlarma)
       .input('Descriere', sql.NVarChar(sql.MAX), Descriere)
       .query(`
         INSERT INTO IstoricAlarmeAvertizari (AlarmaID, PacientID, TipAlarma, Descriere, Actiune)
         VALUES (@AlarmaID, @PacientID, @TipAlarma, @Descriere, 'ADAUGARE')
       `);
-    
+
+    await transaction.commit();
     res.status(201).json({ message: 'Alarmă adăugată cu succes' });
   } catch (err) {
+    await transaction.rollback();
     console.error('Eroare la adăugarea alarmei:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Eroare la adăugarea alarmei' });
   }
 });
 
-// DELETE - Șterge o alarmă și înregistrează în istoric
+// DELETE - Șterge o alarmă și salvează în istoric
 app.delete('/api/doctor/pacient/:id/alarme/:alarmaId', async (req, res) => {
-  const { id, alarmaId } = req.params;
+  const transaction = new sql.Transaction();
   
   try {
+    await transaction.begin();
+
     // Obține informațiile alarmei înainte de ștergere
-    const alarmaInfo = await new sql.Request()
-      .input('AlarmaID', sql.Int, alarmaId)
-      .input('PacientID', sql.Int, id)
+    const alarmaInfo = await new sql.Request(transaction)
+      .input('AlarmaID', sql.Int, req.params.alarmaId)
+      .input('PacientID', sql.Int, req.params.id)
       .query(`
         SELECT TipAlarma, Descriere
         FROM AlarmeAvertizari
@@ -621,15 +645,16 @@ app.delete('/api/doctor/pacient/:id/alarme/:alarmaId', async (req, res) => {
       `);
 
     if (alarmaInfo.recordset.length === 0) {
+      await transaction.rollback();
       return res.status(404).json({ error: 'Alarma nu a fost găsită' });
     }
 
     const { TipAlarma, Descriere } = alarmaInfo.recordset[0];
 
-    // Înregistrează în istoric
-    await new sql.Request()
-      .input('AlarmaID', sql.Int, alarmaId)
-      .input('PacientID', sql.Int, id)
+    // Salvează în istoric
+    await new sql.Request(transaction)
+      .input('AlarmaID', sql.Int, req.params.alarmaId)
+      .input('PacientID', sql.Int, req.params.id)
       .input('TipAlarma', sql.NVarChar(50), TipAlarma)
       .input('Descriere', sql.NVarChar(sql.MAX), Descriere)
       .query(`
@@ -638,37 +663,20 @@ app.delete('/api/doctor/pacient/:id/alarme/:alarmaId', async (req, res) => {
       `);
 
     // Șterge alarma
-    await new sql.Request()
-      .input('AlarmaID', sql.Int, alarmaId)
-      .input('PacientID', sql.Int, id)
+    await new sql.Request(transaction)
+      .input('AlarmaID', sql.Int, req.params.alarmaId)
+      .input('PacientID', sql.Int, req.params.id)
       .query(`
         DELETE FROM AlarmeAvertizari
         WHERE AlarmaID = @AlarmaID AND PacientID = @PacientID
       `);
-    
+
+    await transaction.commit();
     res.json({ message: 'Alarmă ștearsă cu succes' });
   } catch (err) {
+    await transaction.rollback();
     console.error('Eroare la ștergerea alarmei:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET - Obține istoricul alarmelor pentru un pacient
-app.get('/api/doctor/pacient/:id/alarme/istoric', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await new sql.Request()
-      .input('PacientID', sql.Int, id)
-      .query(`
-        SELECT IstoricID, AlarmaID, TipAlarma, Descriere, DataCreare, Actiune
-        FROM IstoricAlarmeAvertizari
-        WHERE PacientID = @PacientID
-        ORDER BY DataCreare DESC
-      `);
-    res.json(result.recordset);
-  } catch (err) {
-    console.error('Eroare la obținerea istoricului alarmelor:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Eroare la ștergerea alarmei' });
   }
 });
 
