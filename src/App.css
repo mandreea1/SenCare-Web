@@ -1068,3 +1068,189 @@ input, textarea {
     height: 40px;
   }
 }
+
+/* Stiluri pentru butonul de salvare fișă PDF */
+.btn-save-pdf {
+  background: linear-gradient(120deg, #23a455 0%, #2ecc71 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px auto;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-save-pdf:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(46, 204, 113, 0.2);
+}
+
+.btn-save-pdf:active {
+  transform: translateY(0);
+}
+
+.btn-save-pdf svg {
+  font-size: 20px;
+}
+
+/* Stiluri pentru istoricul fișelor medicale */
+.istoric-fise-container {
+  margin-top: 32px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #dbeafe;
+  padding: 24px;
+}
+
+.istoric-fise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.istoric-fise-title {
+  color: #2D68F8;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.istoric-fise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fisa-istoric-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f6f7fb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: background 0.2s;
+}
+
+.fisa-istoric-item:hover {
+  background: #eef1fd;
+}
+
+.fisa-istoric-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fisa-istoric-data {
+  font-weight: 600;
+  color: #3840a7;
+}
+
+.fisa-istoric-detalii {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.fisa-istoric-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-view-pdf {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-view-pdf:hover {
+  background: #e0e0e0;
+}
+
+.btn-delete-pdf {
+  background: #fff0f0;
+  color: #cc0000;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-delete-pdf:hover {
+  background: #ffe0e0;
+}
+
+/* Mesaj pentru salvare cu succes */
+.pdf-saved-message {
+  background: #e6ffe6;
+  border-left: 4px solid #23a455;
+  color: #006600;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease-in-out, fadeOut 0.3s ease-in-out 3s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Responsive pentru mobil */
+@media (max-width: 700px) {
+  .istoric-fise-container {
+    padding: 16px 12px;
+  }
+  
+  .istoric-fise-title {
+    font-size: 1.2rem;
+  }
+  
+  .fisa-istoric-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .fisa-istoric-actions {
+    width: 100%;
+  }
+  
+  .btn-view-pdf,
+  .btn-delete-pdf {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .btn-save-pdf {
+    width: 100%;
+    justify-content: center;
+  }
+}

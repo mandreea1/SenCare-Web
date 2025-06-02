@@ -980,7 +980,6 @@ app.post('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
   }
 });
 
-// GET - Obține un PDF specific din istoricul fișelor medicale
 app.get('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res) => {
   try {
     const { recordId } = req.params;
@@ -991,9 +990,6 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res
       return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
     }
     const filepath = result.recordset[0].FilePath;
-    if (!fs.existsSync(filepath)) {
-      return res.status(404).json({ error: 'Fișierul PDF nu a fost găsit' });
-    }
     res.sendFile(path.resolve(filepath));
   } catch (error) {
     console.error('Error retrieving medical record PDF:', error);
