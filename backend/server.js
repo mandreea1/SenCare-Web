@@ -568,6 +568,67 @@ app.post('/api/doctor/pacient/:id/valorinormale', async (req, res) => {
   }
 });
 
+// GET - Obține alarmele pentru un pacient
+app.get('/api/doctor/pacient/:id/alarme', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, id)
+      .query(`
+        SELECT AlarmaID, PacientID, TipAlarma, Descriere, DataCreare
+        FROM AlarmeAvertizari
+        WHERE PacientID = @PacientID
+        ORDER BY DataCreare DESC
+      `);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare la obținerea alarmelor:', err);
+    res.status(500).json({ error: 'Eroare la obținerea alarmelor' });
+  }
+});
+
+// POST - Adaugă o alarmă nouă
+app.post('/api/doctor/pacient/:id/alarme', async (req, res) => {
+  const { id } = req.params;
+  const { TipAlarma, Descriere } = req.body;
+  
+  try {
+    await new sql.Request()
+      .input('PacientID', sql.Int, id)
+      .input('TipAlarma', sql.NVarChar(50), TipAlarma)
+      .input('Descriere', sql.NVarChar(sql.MAX), Descriere)
+      .query(`
+        INSERT INTO AlarmeAvertizari (PacientID, TipAlarma, Descriere)
+        VALUES (@PacientID, @TipAlarma, @Descriere)
+      `);
+    
+    res.status(201).json({ message: 'Alarmă adăugată cu succes' });
+  } catch (err) {
+    console.error('Eroare la adăugarea alarmei:', err);
+    res.status(500).json({ error: 'Eroare la adăugarea alarmei' });
+  }
+});
+
+// DELETE - Șterge o alarmă
+app.delete('/api/doctor/pacient/:id/alarme/:alarmaId', async (req, res) => {
+  const { id, alarmaId } = req.params;
+  
+  try {
+    await new sql.Request()
+      .input('AlarmaID', sql.Int, alarmaId)
+      .input('PacientID', sql.Int, id)
+      .query(`
+        DELETE FROM AlarmeAvertizari
+        WHERE AlarmaID = @AlarmaID AND PacientID = @PacientID
+      `);
+    
+    res.json({ message: 'Alarmă ștearsă cu succes' });
+  } catch (err) {
+    console.error('Eroare la ștergerea alarmei:', err);
+    res.status(500).json({ error: 'Eroare la ștergerea alarmei' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });

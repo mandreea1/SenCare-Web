@@ -23,6 +23,14 @@ function FisaMedicalaPacient() {
   ValoareUmiditateMin: '',
   ValoareUmiditateMax: ''
 });
+
+const [showAlarmModal, setShowAlarmModal] = useState(false);
+const [selectedParameter, setSelectedParameter] = useState(null);
+const [alarmeAvertizari, setAlarmeAvertizari] = useState([]);
+const [newAlarm, setNewAlarm] = useState({
+  TipAlarma: '',
+  Descriere: ''
+});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -91,6 +99,36 @@ useEffect(() => {
   }
   fetchValoriNormale();
 }, [id]);
+
+useEffect(() => {
+  async function fetchAlarme() {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/alarme`);
+      setAlarmeAvertizari(res.data);
+    } catch (err) {
+      console.error('Eroare la încărcarea alarmelor:', err);
+    }
+  }
+  fetchAlarme();
+}, [id]);
+
+// Adaugă aceste funcții de handler
+const handleAddAlarm = (parameter) => {
+  setSelectedParameter(parameter);
+  setShowAlarmModal(true);
+};
+
+const handleSaveAlarm = async () => {
+  try {
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/alarme`, newAlarm);
+    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/alarme`);
+    setAlarmeAvertizari(res.data);
+    setShowAlarmModal(false);
+    setNewAlarm({ TipAlarma: '', Descriere: '' });
+  } catch (err) {
+    alert('Eroare la salvarea alarmei!');
+  }
+};
 
   if (loading) return <div className="fisa-medicala-container">Se încarcă...</div>;
   if (mesaj) return <div className="fisa-medicala-container" style={{ color: 'red' }}>{mesaj}</div>;
@@ -198,33 +236,113 @@ const handleSaveValori = async () => {
             </div>
 
         <div className="fisa-section">
-          <b>IV. Tratamente/monitorizări și recomandări</b>
-          <table className="fisa-tabel">
-            <thead>
-              <tr>
-                <th>Nr.</th>
-                <th>Tipul tratamentului</th>
-                <th>Tratament curent<br />(scurtă descriere)</th>
-                <th>Tratament recomandat<br />(de către medic)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(pacient.Tratamente || []).map((tr, idx) => (
-                <tr key={idx}>
-                  <td>{idx + 1}</td>
-                  <td>{tr.tip || '-'}</td>
-                  <td>{tr.curent || '-'}</td>
-                  <td>{tr.recomandat || '-'}</td>
-                </tr>
-              ))}
-              {(!pacient.Tratamente || pacient.Tratamente.length === 0) && (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', color: '#aaa' }}>Nu există tratamente introduse.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+  <b>IV. Alarme și Avertizări</b>
+  <div className="alarme-grid">
+    {/* Temperatura */}
+    <div className="parametru-card">
+      <h3>Temperatura</h3>
+      <div className="alarme-list">
+        {alarmeAvertizari
+          .filter(a => a.TipAlarma.includes('Temperatura'))
+          .map((alarma, idx) => (
+            <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
+              <span className="alarma-tip">{alarma.TipAlarma}</span>
+              <span className="alarma-descriere">{alarma.Descriere}</span>
+            </div>
+          ))}
+      </div>
+      <button className="btn-add-alarm" onClick={() => handleAddAlarm('Temperatura')}>
+        + Adaugă Alarmă/Avertizare
+      </button>
+    </div>
+
+    {/* Puls */}
+    <div className="parametru-card">
+      <h3>Puls</h3>
+      <div className="alarme-list">
+        {alarmeAvertizari
+          .filter(a => a.TipAlarma.includes('Puls'))
+          .map((alarma, idx) => (
+            <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
+              <span className="alarma-tip">{alarma.TipAlarma}</span>
+              <span className="alarma-descriere">{alarma.Descriere}</span>
+            </div>
+          ))}
+      </div>
+      <button className="btn-add-alarm" onClick={() => handleAddAlarm('Puls')}>
+        + Adaugă Alarmă/Avertizare
+      </button>
+    </div>
+
+    {/* ECG */}
+    <div className="parametru-card">
+      <h3>ECG</h3>
+      <div className="alarme-list">
+        {alarmeAvertizari
+          .filter(a => a.TipAlarma.includes('ECG'))
+          .map((alarma, idx) => (
+            <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
+              <span className="alarma-tip">{alarma.TipAlarma}</span>
+              <span className="alarma-descriere">{alarma.Descriere}</span>
+            </div>
+          ))}
+      </div>
+      <button className="btn-add-alarm" onClick={() => handleAddAlarm('ECG')}>
+        + Adaugă Alarmă/Avertizare
+      </button>
+    </div>
+
+    {/* Umiditate */}
+    <div className="parametru-card">
+      <h3>Umiditate</h3>
+      <div className="alarme-list">
+        {alarmeAvertizari
+          .filter(a => a.TipAlarma.includes('Umiditate'))
+          .map((alarma, idx) => (
+            <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
+              <span className="alarma-tip">{alarma.TipAlarma}</span>
+              <span className="alarma-descriere">{alarma.Descriere}</span>
+            </div>
+          ))}
+      </div>
+      <button className="btn-add-alarm" onClick={() => handleAddAlarm('Umiditate')}>
+        + Adaugă Alarmă/Avertizare
+      </button>
+    </div>
+  </div>
+
+  {/* Modal pentru adăugare alarmă/avertizare */}
+  {showAlarmModal && (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3>Adaugă Alarmă/Avertizare pentru {selectedParameter}</h3>
+        <div className="form-group">
+          <label>Tip:</label>
+          <select 
+            value={newAlarm.TipAlarma} 
+            onChange={(e) => setNewAlarm({...newAlarm, TipAlarma: e.target.value})}
+          >
+            <option value="">Selectează tipul...</option>
+            <option value={`Alarma ${selectedParameter}`}>Alarmă</option>
+            <option value={`Avertizare ${selectedParameter}`}>Avertizare</option>
+          </select>
         </div>
+        <div className="form-group">
+          <label>Descriere:</label>
+          <textarea
+            value={newAlarm.Descriere}
+            onChange={(e) => setNewAlarm({...newAlarm, Descriere: e.target.value})}
+            placeholder="Introduceți descrierea..."
+          />
+        </div>
+        <div className="modal-buttons">
+          <button className="btn-primary" onClick={handleSaveAlarm}>Salvează</button>
+          <button className="btn-secondary" onClick={() => setShowAlarmModal(false)}>Anulează</button>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
         <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => navigate(-1)}>
           Înapoi la pacienți
         </button>
