@@ -9,6 +9,7 @@ function ForgotPassword() {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
+  setIsLoading(true);
   try {
     const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/forgot-password`, { email });
     setIsError(false);
@@ -16,6 +17,8 @@ function ForgotPassword() {
   } catch (err) {
     setIsError(true);
     setMessage(err.response?.data?.error || 'A apărut o eroare. Vă rugăm încercați din nou.');
+  } finally {
+    setIsLoading(false);
   }
 };
 
