@@ -973,43 +973,71 @@ input, textarea {
   cursor: not-allowed;
 }
 
-/* Welcome Banner Responsive Styles */
+.welcome-banner {
+  color: #2474B5;
+  padding: 3rem 1rem 2rem; /* Am mărit padding-ul de sus */
+  margin: 2rem auto;
+  text-align: center;
+  width: 100%;
+  max-width: 1000px;
+  background: none;
+}
+
+.welcome-content {
+  max-width: 800px;
+  margin: 2rem auto 0; /* Am adăugat margin-top */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .welcome-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap; /* Permite elementelor să treacă pe linia următoare pe ecrane mici */
+  gap: 16px;
+  margin-bottom: 1.5rem;
+  margin-top: 2rem; /* Am adăugat margin-top */
 }
 
 .welcome-content h1 {
   margin: 0;
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   color: #2474B5;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
-.welcome-content h2,
+.welcome-content h2 {
+  color: #2474B5;
+  font-size: 1.8rem;
+  margin: 0.5rem 0 1rem;
+  font-weight: 600;
+}
+
 .welcome-content p {
   color: #2474B5;
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
 }
 
 .logo-image {
   width: 60px;
   height: 60px;
   background: transparent !important;
-  mix-blend-mode: multiply; /* Ajută la eliminarea fundalului alb */
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 0 1px rgba(36, 116, 181, 0.2));
 }
 
 /* Media queries pentru responsive design */
 @media screen and (max-width: 768px) {
   .welcome-banner {
-    margin: 6rem auto 2rem; /* Spațiere mai mică pe mobile */
-    padding: 0.5rem;
+    margin: 1.5rem auto;
+    padding: 1.5rem 1rem;
   }
   
   .welcome-content h1 {
-    font-size: 1.8rem; /* Text mai mic pe mobile */
-    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
   }
   
   .welcome-content h2 {
@@ -1019,23 +1047,24 @@ input, textarea {
   .welcome-content p {
     font-size: 1rem;
   }
-  
-  .welcome-header {
-    flex-direction: column; /* Stivuiește elementele pe mobile */
-  }
-  
-  .logo-image {
-    width: 50px;
-    height: 50px;
-  }
 }
 
 @media screen and (max-width: 480px) {
+  .welcome-header {
+    flex-direction: row; /* Păstrăm pe același rând pentru ecrane foarte mici */
+    gap: 10px;
+  }
+  
   .welcome-content h1 {
     font-size: 1.5rem;
   }
   
   .welcome-content h2 {
     font-size: 1.3rem;
+  }
+  
+  .logo-image {
+    width: 40px;
+    height: 40px;
   }
 }
