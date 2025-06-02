@@ -505,14 +505,14 @@ app.get('/api/doctor/pacient/:id/valorinormale', async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query('SELECT * FROM valorinormalepacient WHERE PacientId = ?', [id]);
-   if (rows.length === 0) return res.json({});
+    if (rows.length === 0) return res.json({});
     res.json(rows[0]);
   } catch (err) {
+    console.error('Eroare SQL valorinormale:', err); // <-- adaugă asta
     res.status(500).json({ error: 'Eroare la interogare valori normale.' });
   }
 });
 
-// POST/PUT valorile normale pentru un pacient
 app.post('/api/doctor/pacient/:id/valorinormale', async (req, res) => {
   try {
     const { id } = req.params;
@@ -523,30 +523,28 @@ app.post('/api/doctor/pacient/:id/valorinormale', async (req, res) => {
       ValoareUmiditateMin, ValoareUmiditateMax
     } = req.body;
 
-    // Încearcă update, dacă nu există, inserează
-    const [result] = await db.query(
-      `INSERT INTO valorinormalepacient
-        (PacientId, ValoarePulsMin, ValoarePulsMax, ValoareTemperaturaMin, ValoareTemperaturaMax, ValoareECGMin, ValoareECGMax, ValoareUmiditateMin, ValoareUmiditateMax)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-        ValoarePulsMin=VALUES(ValoarePulsMin),
-        ValoarePulsMax=VALUES(ValoarePulsMax),
-        ValoareTemperaturaMin=VALUES(ValoareTemperaturaMin),
-        ValoareTemperaturaMax=VALUES(ValoareTemperaturaMax),
-        ValoareECGMin=VALUES(ValoareECGMin),
-        ValoareECGMax=VALUES(ValoareECGMax),
-        ValoareUmiditateMin=VALUES(ValoareUmiditateMin),
-        ValoareUmiditateMax=VALUES(ValoareUmiditateMax)
-      `,
-      [
-        id, ValoarePulsMin, ValoarePulsMax,
-        ValoareTemperaturaMin, ValoareTemperaturaMax,
-        ValoareECGMin, ValoareECGMax,
-        ValoareUmiditateMin, ValoareUmiditateMax
-      ]
-    );
+    // Upsert pentru SQL Server
+    await sql.query`
+      MERGE valorinormalepacient AS target
+      USING (SELECT ${id} AS PacientId) AS source
+      ON (target.PacientId = source.PacientId)
+      WHEN MATCHED THEN
+        UPDATE SET 
+          ValoarePulsMin = ${ValoarePulsMin},
+          ValoarePulsMax = ${ValoarePulsMax},
+          ValoareTemperaturaMin = ${ValoareTemperaturaMin},
+          ValoareTemperaturaMax = ${ValoareTemperaturaMax},
+          ValoareECGMin = ${ValoareECGMin},
+          ValoareECGMax = ${ValoareECGMax},
+          ValoareUmiditateMin = ${ValoareUmiditateMin},
+          ValoareUmiditateMax = ${ValoareUmiditateMax}
+      WHEN NOT MATCHED THEN
+        INSERT (PacientId, ValoarePulsMin, ValoarePulsMax, ValoareTemperaturaMin, ValoareTemperaturaMax, ValoareECGMin, ValoareECGMax, ValoareUmiditateMin, ValoareUmiditateMax)
+        VALUES (${id}, ${ValoarePulsMin}, ${ValoarePulsMax}, ${ValoareTemperaturaMin}, ${ValoareTemperaturaMax}, ${ValoareECGMin}, ${ValoareECGMax}, ${ValoareUmiditateMin}, ${ValoareUmiditateMax});
+    `;
     res.json({ success: true });
   } catch (err) {
+    console.error('Eroare SQL valorinormale:', err);
     res.status(500).json({ error: 'Eroare la salvare valori normale.' });
   }
 });
