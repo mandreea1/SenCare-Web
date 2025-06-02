@@ -976,6 +976,43 @@ app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, 
   }
 });
 
+app.get('/api/pacient/profile', async (req, res) => {
+  const { userId, email } = req.query;
+  if (!userId && !email) {
+    return res.status(400).json({ error: 'Trebuie să trimiți userId sau email.' });
+  }
+
+  try {
+    let result;
+    if (userId) {
+      result = await sql.query`
+        SELECT 
+          u.UserID, u.Email, u.UserType, 
+          p.PacientID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca
+        FROM Utilizatori u
+        INNER JOIN Pacienti p ON u.UserID = p.UserID
+        WHERE u.UserID = ${userId} AND u.UserType = 'Pacient'
+      `;
+    } else {
+      result = await sql.query`
+        SELECT 
+          u.UserID, u.Email, u.UserType, 
+          p.PacientID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca
+        FROM Utilizatori u
+        INNER JOIN Pacienti p ON u.UserID = p.UserID
+        WHERE u.Email = ${email} AND u.UserType = 'Pacient'
+      `;
+    }
+
+    if (!result.recordset.length) {
+      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    }
+    res.json(result.recordset[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
