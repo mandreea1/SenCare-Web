@@ -184,6 +184,21 @@ const handleSaveValori = async () => {
     alert('Eroare la salvare valori normale! ' + (err.response?.data?.message || err.message));
   }
 };
+
+const handleDeleteAlarm = async (alarmaId) => {
+  if (window.confirm('Sigur doriți să ștergeți această alarmă?')) {
+    try {
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/alarme/${alarmaId}`);
+      
+      // Reîncarcă lista de alarme
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/alarme`);
+      setAlarmeAvertizari(res.data);
+    } catch (err) {
+      console.error('Eroare la ștergerea alarmei:', err);
+      alert('Eroare la ștergerea alarmei: ' + (err.response?.data?.error || err.message));
+    }
+  }
+};
   return (
     <div className="fisa-medicala-container">
       <div className="fisa-medicala-card">
@@ -261,9 +276,18 @@ const handleSaveValori = async () => {
           .filter(a => a.TipAlarma.includes('Temperatura'))
           .map((alarma, idx) => (
             <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
-              <span className="alarma-tip">{alarma.TipAlarma}</span>
-              <span className="alarma-descriere">{alarma.Descriere}</span>
-            </div>
+  <div className="alarma-header">
+    <span className="alarma-tip">{alarma.TipAlarma}</span>
+    <button 
+      className="btn-delete-alarm" 
+      onClick={() => handleDeleteAlarm(alarma.AlarmaID)}
+      title="Șterge alarma"
+    >
+      ×
+    </button>
+  </div>
+  <span className="alarma-descriere">{alarma.Descriere}</span>
+</div>
           ))}
       </div>
       <button className="btn-add-alarm" onClick={() => handleAddAlarm('Temperatura')}>
@@ -279,9 +303,18 @@ const handleSaveValori = async () => {
           .filter(a => a.TipAlarma.includes('Puls'))
           .map((alarma, idx) => (
             <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
-              <span className="alarma-tip">{alarma.TipAlarma}</span>
-              <span className="alarma-descriere">{alarma.Descriere}</span>
-            </div>
+  <div className="alarma-header">
+    <span className="alarma-tip">{alarma.TipAlarma}</span>
+    <button 
+      className="btn-delete-alarm" 
+      onClick={() => handleDeleteAlarm(alarma.AlarmaID)}
+      title="Șterge alarma"
+    >
+      ×
+    </button>
+  </div>
+  <span className="alarma-descriere">{alarma.Descriere}</span>
+</div>
           ))}
       </div>
       <button className="btn-add-alarm" onClick={() => handleAddAlarm('Puls')}>
@@ -297,9 +330,18 @@ const handleSaveValori = async () => {
           .filter(a => a.TipAlarma.includes('ECG'))
           .map((alarma, idx) => (
             <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
-                <span className="alarma-tip">{alarma.TipAlarma}</span>
-                <span className="alarma-descriere">{alarma.Descriere}</span>
-            </div>
+  <div className="alarma-header">
+    <span className="alarma-tip">{alarma.TipAlarma}</span>
+    <button 
+      className="btn-delete-alarm" 
+      onClick={() => handleDeleteAlarm(alarma.AlarmaID)}
+      title="Șterge alarma"
+    >
+      ×
+    </button>
+  </div>
+  <span className="alarma-descriere">{alarma.Descriere}</span>
+</div>
           ))}
       </div>
       <button className="btn-add-alarm" onClick={() => handleAddAlarm('ECG')}>
@@ -315,9 +357,18 @@ const handleSaveValori = async () => {
           .filter(a => a.TipAlarma.includes('Umiditate'))
           .map((alarma, idx) => (
             <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
-              <span className="alarma-tip">{alarma.TipAlarma}</span>
-              <span className="alarma-descriere">{alarma.Descriere}</span>
-            </div>
+  <div className="alarma-header">
+    <span className="alarma-tip">{alarma.TipAlarma}</span>
+    <button 
+      className="btn-delete-alarm" 
+      onClick={() => handleDeleteAlarm(alarma.AlarmaID)}
+      title="Șterge alarma"
+    >
+      ×
+    </button>
+  </div>
+  <span className="alarma-descriere">{alarma.Descriere}</span>
+</div>
           ))}
       </div>
       <button className="btn-add-alarm" onClick={() => handleAddAlarm('Umiditate')}>

@@ -736,3 +736,35 @@ input, textarea {
   gap: 8px;
   margin-top: 16px;
 }
+
+.alarma-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-delete-alarm {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.btn-delete-alarm:hover {
+  opacity: 1;
+  color: #ff4444;
+}
+
+/* Asigură-te că butonul de ștergere e vizibil doar la hover pe alarma-item */
+.alarma-item .btn-delete-alarm {
+  opacity: 0;
+}
+
+.alarma-item:hover .btn-delete-alarm {
+  opacity: 0.7;
+}

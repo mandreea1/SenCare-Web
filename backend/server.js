@@ -606,6 +606,26 @@ app.post('/api/doctor/pacient/:id/alarme', async (req, res) => {
   }
 });
 
+// Adaugă acest endpoint după celelalte endpoint-uri pentru alarme
+app.delete('/api/doctor/pacient/:id/alarme/:alarmaId', async (req, res) => {
+  const { id, alarmaId } = req.params;
+  
+  try {
+    await new sql.Request()
+      .input('AlarmaID', sql.Int, alarmaId)
+      .input('PacientID', sql.Int, id)
+      .query(`
+        DELETE FROM AlarmeAvertizari
+        WHERE AlarmaID = @AlarmaID AND PacientID = @PacientID
+      `);
+    
+    res.json({ message: 'Alarmă ștearsă cu succes' });
+  } catch (err) {
+    console.error('Eroare la ștergerea alarmei:', err);
+    res.status(500).json({ error: 'Eroare la ștergerea alarmei' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });
