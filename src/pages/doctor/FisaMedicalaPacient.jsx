@@ -102,17 +102,17 @@ useEffect(() => {
 
 const handleSaveValori = async () => {
   try {
-    // Salvează valorile normale
+    // Crează textul pentru istoric cu valorile vechi
+    const dataActuala = new Date().toLocaleString('ro-RO');
+    const istoricText = `[${dataActuala}] Modificare valori normale - Valori vechi: Puls: ${valoriNormale.ValoarePulsMin}-${valoriNormale.ValoarePulsMax} bpm, ` +
+      `Temperatură: ${valoriNormale.ValoareTemperaturaMin}-${valoriNormale.ValoareTemperaturaMax}°C, ` +
+      `ECG: ${valoriNormale.ValoareECGMin}-${valoriNormale.ValoareECGMax}, ` +
+      `Umiditate: ${valoriNormale.ValoareUmiditateMin}-${valoriNormale.ValoareUmiditateMax}%`;
+
+    // Salvează valorile noi
     await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/valorinormale`, formValori);
     
-    // Crează textul pentru istoric
-    const dataActuala = new Date().toLocaleString('ro-RO');
-    const istoricText = `[${dataActuala}] Modificare valori normale: Puls: ${formValori.ValoarePulsMin}-${formValori.ValoarePulsMax} bpm, ` +
-      `Temperatură: ${formValori.ValoareTemperaturaMin}-${formValori.ValoareTemperaturaMax}°C, ` +
-      `ECG: ${formValori.ValoareECGMin}-${formValori.ValoareECGMax}, ` +
-      `Umiditate: ${formValori.ValoareUmiditateMin}-${formValori.ValoareUmiditateMax}%`;
-
-    // Salvează în istoric
+    // Salvează în istoric valorile vechi
     await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/istoric`, {
       istoricpacient: istoricText
     });

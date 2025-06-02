@@ -29,17 +29,36 @@ function EditarePacient() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setMesaj('');
-    try {
-      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`, form);
-      setMesaj('Datele au fost actualizate cu succes!');
-      setTimeout(() => navigate(-1), 1200);
-    } catch (err) {
-      setMesaj('Eroare la actualizare: ' + (err.response?.data?.error || err.message));
+const handleSubmit = async e => {
+  e.preventDefault();
+  setMesaj('');
+  try {
+    // Crează textul pentru istoric comparând valorile vechi cu cele noi
+    const dataActuala = new Date().toLocaleString('ro-RO');
+    const modificari = Object.entries(form)
+      .filter(([key, value]) => value !== form[key] && key !== 'id' && key !== 'PacientID')
+      .map(([key, value]) => `${key}: ${form[key] || '-'} → ${value || '-'}`)
+      .join(', ');
+    
+    const istoricText = `[${dataActuala}] Modificare date pacient: ${modificari}`;
+
+    // Salvează modificările pacientului
+    await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`, form);
+    
+    // Adaugă în istoric
+    if (modificari.length > 0) {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/istoric`, {
+        istoricpacient: istoricText
+      });
     }
-  };
+
+    setMesaj('Datele au fost actualizate cu succes!');
+    setTimeout(() => navigate(-1), 1200);
+  } catch (err) {
+    console.error('Eroare:', err);
+    setMesaj('Eroare la actualizare: ' + (err.response?.data?.error || err.message));
+  }
+};
 
   if (loading) return <div className="my-patients-list-container">Se încarcă...</div>;
   if (!form) return <div className="my-patients-list-container">Nu există date pentru acest pacient.</div>;
