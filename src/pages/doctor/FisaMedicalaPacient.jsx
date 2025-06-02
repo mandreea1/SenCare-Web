@@ -315,30 +315,6 @@ const handleSavePdfWithHistory = async () => {
 };
 
 
-  // Funcția pentru vizualizarea unui PDF din istoric
-const handleViewPdf = async (recordId) => {
-  try {
-    const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf/${recordId}`,
-      { responseType: 'blob' }
-    );
-    
-    // Creăm un URL pentru blob-ul primit
-    const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-    
-    // Deschidem PDF-ul într-un tab nou
-    window.open(fileURL, '_blank');
-  } catch (err) {
-    console.error('Eroare la deschiderea PDF-ului:', err);
-    
-    if (err.response?.status === 404) {
-      alert('Fișa medicală nu a fost găsită pe server. Este posibil să fi fost ștearsă sau mutată.');
-    } else {
-      alert('Eroare la deschiderea fișei medicale: ' + (err.message || 'A apărut o eroare necunoscută'));
-    }
-  }
-};
-
 const handleDeletePdf = async (recordId) => {
   if (window.confirm('Sigur doriți să ștergeți această fișă medicală?')) {
     try {
