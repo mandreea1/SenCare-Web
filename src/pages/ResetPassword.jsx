@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 function ResetPassword() {
@@ -11,32 +11,32 @@ function ResetPassword() {
   const { token } = useParams();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (password !== confirmPassword) {
-    setMessage('Parolele nu coincid.');
-    setIsError(true);
-    return;
-  }
-  setIsLoading(true);
-  try {
-    await axios.post(
-      `${process.env.REACT_APP_BACKEND_URL}/api/reset-password`,
-      {
-        token,      // tokenul din URL
-        password    // parola nouă
-      }
-    );
-    setMessage('Parola a fost resetată cu succes!');
-    setIsError(false);
-    // Poți naviga la login după câteva secunde, dacă vrei
-    // setTimeout(() => navigate('/login'), 2000);
-  } catch (err) {
-    setMessage('A apărut o eroare. Vă rugăm încercați din nou.');
-    setIsError(true);
-  } finally {
-    setIsLoading(false);
-  }
-};
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setMessage('Parolele nu coincid.');
+      setIsError(true);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/reset-password`,
+        {
+          token,      // tokenul din URL
+          password    // parola nouă
+        }
+      );
+      setMessage('Parola a fost resetată cu succes!');
+      setIsError(false);
+      // Poți naviga la login după câteva secunde, dacă vrei
+      // setTimeout(() => navigate('/login'), 2000);
+    } catch (err) {
+      setMessage('A apărut o eroare. Vă rugăm încercați din nou.');
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="forgot-password-container">
@@ -76,6 +76,10 @@ function ResetPassword() {
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Se procesează...' : 'Resetează parola'}
         </button>
+        
+        <div className="login-link">
+          <a href="/login">Înapoi la login</a>
+        </div>
       </form>
     </div>
   );
