@@ -501,6 +501,56 @@ app.get('/api/doctor/pacient/:id/ecg-ultim', async (req, res) => {
   }
 });
 
+app.get('/pacient/:id/valorinormale', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.query('SELECT * FROM valorinormalepacient WHERE PacientId = ?', [id]);
+    if (rows.length === 0) return res.status(404).json({});
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Eroare la interogare valori normale.' });
+  }
+});
+
+// POST/PUT valorile normale pentru un pacient
+app.post('/pacient/:id/valorinormale', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      ValoarePulsMin, ValoarePulsMax,
+      ValoareTemperaturaMin, ValoareTemperaturaMax,
+      ValoareECGMin, ValoareECGMax,
+      ValoareUmiditateMin, ValoareUmiditateMax
+    } = req.body;
+
+    // Încearcă update, dacă nu există, inserează
+    const [result] = await db.query(
+      `INSERT INTO valorinormalepacient
+        (PacientId, ValoarePulsMin, ValoarePulsMax, ValoareTemperaturaMin, ValoareTemperaturaMax, ValoareECGMin, ValoareECGMax, ValoareUmiditateMin, ValoareUmiditateMax)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+        ValoarePulsMin=VALUES(ValoarePulsMin),
+        ValoarePulsMax=VALUES(ValoarePulsMax),
+        ValoareTemperaturaMin=VALUES(ValoareTemperaturaMin),
+        ValoareTemperaturaMax=VALUES(ValoareTemperaturaMax),
+        ValoareECGMin=VALUES(ValoareECGMin),
+        ValoareECGMax=VALUES(ValoareECGMax),
+        ValoareUmiditateMin=VALUES(ValoareUmiditateMin),
+        ValoareUmiditateMax=VALUES(ValoareUmiditateMax)
+      `,
+      [
+        id, ValoarePulsMin, ValoarePulsMax,
+        ValoareTemperaturaMin, ValoareTemperaturaMax,
+        ValoareECGMin, ValoareECGMax,
+        ValoareUmiditateMin, ValoareUmiditateMax
+      ]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Eroare la salvare valori normale.' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });

@@ -11,6 +11,18 @@ function FisaMedicalaPacient() {
   const [loading, setLoading] = useState(true);
   const [mesaj, setMesaj] = useState('');
   const [ecgStringDinBackendSauUltimaMasurare, setEcgStringDinBackendSauUltimaMasurare] = useState('');
+  const [valoriNormale, setValoriNormale] = useState(null);
+  const [editValori, setEditValori] = useState(false);
+  const [formValori, setFormValori] = useState({
+  ValoarePulsMin: '',
+  ValoarePulsMax: '',
+  ValoareTemperaturaMin: '',
+  ValoareTemperaturaMax: '',
+  ValoareECGMin: '',
+  ValoareECGMax: '',
+  ValoareUmiditateMin: '',
+  ValoareUmiditateMax: ''
+});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,9 +70,36 @@ useEffect(() => {
   fetchEcg();
 }, [id]);
 
+useEffect(() => {
+  async function fetchValoriNormale() {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/valorinormale`);
+      setValoriNormale(res.data);
+      setFormValori(res.data || formValori);
+    } catch (err) {
+      setValoriNormale(null);
+    }
+  }
+  fetchValoriNormale();
+}, [id]);
+
   if (loading) return <div className="fisa-medicala-container">Se încarcă...</div>;
   if (mesaj) return <div className="fisa-medicala-container" style={{ color: 'red' }}>{mesaj}</div>;
   if (!pacient) return <div className="fisa-medicala-container">Nu există fișă medicală pentru acest pacient.</div>;
+
+  const handleChangeValori = (e) => {
+  setFormValori({ ...formValori, [e.target.name]: e.target.value });
+};
+
+const handleSaveValori = async () => {
+  try {
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/valorinormale`, formValori);
+    setValoriNormale(formValori);
+    setEditValori(false);
+  } catch (err) {
+    alert('Eroare la salvare valori normale!');
+  }
+};
 
   return (
     <div className="fisa-medicala-container">
@@ -97,9 +136,35 @@ useEffect(() => {
           </div>
         </div>
         <div className="fisa-section">
-          <b>III. Diagnostic medical cu specificație cod (ICD 10)</b>
-          <div className="fisa-field">{pacient.Diagnostic || <i>-</i>}</div>
-        </div>
+            <b>III. Valori normale senzori</b>
+            {!editValori && valoriNormale && (
+                <div>
+                <div>Puls: {valoriNormale.ValoarePulsMin} - {valoriNormale.ValoarePulsMax} bpm</div>
+                <div>Temperatură: {valoriNormale.ValoareTemperaturaMin} - {valoriNormale.ValoareTemperaturaMax} °C</div>
+                <div>ECG: {valoriNormale.ValoareECGMin} - {valoriNormale.ValoareECGMax}</div>
+                <div>Umiditate: {valoriNormale.ValoareUmiditateMin} - {valoriNormale.ValoareUmiditateMax} %</div>
+                <button className="btn-primary" onClick={() => setEditValori(true)}>Editează valori normale</button>
+                </div>
+            )}
+            {editValori && (
+                <div>
+                <label>Puls min: <input type="number" name="ValoarePulsMin" value={formValori.ValoarePulsMin} onChange={handleChangeValori} /></label>
+                <label>Puls max: <input type="number" name="ValoarePulsMax" value={formValori.ValoarePulsMax} onChange={handleChangeValori} /></label>
+                <label>Temperatură min: <input type="number" name="ValoareTemperaturaMin" value={formValori.ValoareTemperaturaMin} onChange={handleChangeValori} /></label>
+                <label>Temperatură max: <input type="number" name="ValoareTemperaturaMax" value={formValori.ValoareTemperaturaMax} onChange={handleChangeValori} /></label>
+                <label>ECG min: <input type="number" name="ValoareECGMin" value={formValori.ValoareECGMin} onChange={handleChangeValori} /></label>
+                <label>ECG max: <input type="number" name="ValoareECGMax" value={formValori.ValoareECGMax} onChange={handleChangeValori} /></label>
+                <label>Umiditate min: <input type="number" name="ValoareUmiditateMin" value={formValori.ValoareUmiditateMin} onChange={handleChangeValori} /></label>
+                <label>Umiditate max: <input type="number" name="ValoareUmiditateMax" value={formValori.ValoareUmiditateMax} onChange={handleChangeValori} /></label>
+                <button className="btn-primary" onClick={handleSaveValori}>Salvează</button>
+                <button className="btn-secondary" onClick={() => setEditValori(false)}>Anulează</button>
+                </div>
+            )}
+            {!valoriNormale && !editValori && (
+                <button className="btn-primary" onClick={() => setEditValori(true)}>Definește valori normale</button>
+            )}
+            </div>
+
         <div className="fisa-section">
           <b>IV. Tratamente/monitorizări și recomandări</b>
           <table className="fisa-tabel">
