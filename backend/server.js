@@ -686,8 +686,7 @@ app.get('/api/doctor/pacient/:id/recomandari', async (req, res) => {
         const result = await new sql.Request()
             .input('PacientID', sql.Int, req.params.id)
             .query(`
-                SELECT RecomandareID, PacientID, TipRecomandare, DurataZilnica, 
-                       AlteIndicatii, DataRecomandare
+                SELECT *
                 FROM Recomandari
                 WHERE PacientID = @PacientID
                 ORDER BY DataRecomandare DESC
@@ -695,7 +694,7 @@ app.get('/api/doctor/pacient/:id/recomandari', async (req, res) => {
         res.json(result.recordset);
     } catch (err) {
         console.error('Eroare la obținerea recomandărilor:', err);
-        res.status(500).json({ error: 'Eroare la obținerea recomandărilor' });
+        res.status(500).json({ error: 'Eroare la obținerea recomandărilor: ' + err.message });
     }
 });
 
@@ -704,38 +703,54 @@ app.post('/api/doctor/pacient/:id/recomandari', async (req, res) => {
     try {
         const { TipRecomandare, DurataZilnica, AlteIndicatii } = req.body;
         
-        await new sql.Request()
+        // Validare
+        if (!TipRecomandare) {
+            return res.status(400).json({ error: 'Tipul recomandării este obligatoriu' });
+        }
+
+        const result = await new sql.Request()
             .input('PacientID', sql.Int, req.params.id)
             .input('TipRecomandare', sql.NVarChar(100), TipRecomandare)
-            .input('DurataZilnica', sql.NVarChar(50), DurataZilnica)
-            .input('AlteIndicatii', sql.NVarChar(sql.MAX), AlteIndicatii)
+            .input('DurataZilnica', sql.NVarChar(50), DurataZilnica || '')
+            .input('AlteIndicatii', sql.NVarChar(sql.MAX), AlteIndicatii || '')
             .query(`
                 INSERT INTO Recomandari (PacientID, TipRecomandare, DurataZilnica, AlteIndicatii)
-                VALUES (@PacientID, @TipRecomandare, @DurataZilnica, @AlteIndicatii)
+                VALUES (@PacientID, @TipRecomandare, @DurataZilnica, @AlteIndicatii);
+                
+                SELECT SCOPE_IDENTITY() AS RecomandareID;
             `);
-        
-        res.status(201).json({ message: 'Recomandare adăugată cu succes' });
+
+        res.status(201).json({ 
+            message: 'Recomandare adăugată cu succes',
+            recomandareId: result.recordset[0].RecomandareID
+        });
     } catch (err) {
         console.error('Eroare la adăugarea recomandării:', err);
-        res.status(500).json({ error: 'Eroare la adăugarea recomandării' });
+        res.status(500).json({ error: 'Eroare la adăugarea recomandării: ' + err.message });
     }
 });
 
 // DELETE - Șterge o recomandare
 app.delete('/api/doctor/pacient/:id/recomandari/:recomandareId', async (req, res) => {
     try {
-        await new sql.Request()
+        const result = await new sql.Request()
             .input('RecomandareID', sql.Int, req.params.recomandareId)
             .input('PacientID', sql.Int, req.params.id)
             .query(`
                 DELETE FROM Recomandari
-                WHERE RecomandareID = @RecomandareID AND PacientID = @PacientID
+                WHERE RecomandareID = @RecomandareID AND PacientID = @PacientID;
+                
+                SELECT @@ROWCOUNT AS deleted;
             `);
-        
+
+        if (result.recordset[0].deleted === 0) {
+            return res.status(404).json({ error: 'Recomandarea nu a fost găsită' });
+        }
+
         res.json({ message: 'Recomandare ștearsă cu succes' });
     } catch (err) {
         console.error('Eroare la ștergerea recomandării:', err);
-        res.status(500).json({ error: 'Eroare la ștergerea recomandării' });
+        res.status(500).json({ error: 'Eroare la ștergerea recomandării: ' + err.message });
     }
 });
 
