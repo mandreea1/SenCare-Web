@@ -768,3 +768,54 @@ input, textarea {
 .alarma-item:hover .btn-delete-alarm {
   opacity: 0.7;
 }
+
+.istoric-alarme {
+  margin-top: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.istoric-item {
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.istoric-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.istoric-data {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.istoric-actiune {
+  font-size: 0.8em;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.istoric-actiune.adaugare {
+  background-color: #e6ffe6;
+  color: #006600;
+}
+
+.istoric-actiune.stergere {
+  background-color: #ffe6e6;
+  color: #cc0000;
+}
+
+.istoric-tip {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.istoric-descriere {
+  font-size: 0.9em;
+  color: #444;
+}
