@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FaUserMd, FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
+import logo from '../../assets/logo1.png';
 
 export default function DoctorDashboard({ onLogout, user }) {
   const [doctor, setDoctor] = useState(null);
@@ -48,8 +49,10 @@ export default function DoctorDashboard({ onLogout, user }) {
       <nav className="doctor-navbar">
         <div className="logo">
           <FaUserMd />
-          SenCare
-        </div>
+            <Link to="/doctor">
+                SenCare
+              </Link>
+            </div>
         <div className="nav-menu">
           <Link
             to="/doctor/add-pacient"
@@ -77,24 +80,26 @@ export default function DoctorDashboard({ onLogout, user }) {
       {/* Main Content */}
       <main className="main-content">
         {isDashboard && (
-          <div className="bg-white rounded shadow-sm p-4 mb-4" style={{ maxWidth: 420 }}>
-            <div className="fs-2 fw-bold mb-3">Datele medicului</div>
-            {loading && <div>Se încarcă datele...</div>}
-            {error && <div className="text-danger">{error}</div>}
-            {!loading && doctor && (
-              <>
-                <div className="fs-4 fw-semibold mb-2">
-                  {doctor.Nume} {doctor.Prenume}
-                </div>
-                <div className="text-primary fw-medium mb-1">
-                  Specializare: {doctor.Specializare}
-                </div>
-                <div className="text-muted mb-1">Telefon: {doctor.Telefon}</div>
-                <div className="text-secondary mb-1">Email: {doctor.Email}</div>
-              </>
-            )}
-          </div>
-        )}
+  <div className="welcome-banner">
+    <div className="welcome-content">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+        <h1 style={{ margin: 0 }}>Bun venit la SenCare!</h1>
+        <img
+          src={logo}
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: '50%'
+          }}
+        />
+      </div>
+      {!loading && doctor && (
+        <h2>Dr. {doctor.Nume} {doctor.Prenume}</h2>
+      )}
+      <p>Sistem pentru monitorizarea și îngrijirea pacienților</p>
+    </div>
+  </div>
+)}
         <Outlet />
       </main>
     </div>

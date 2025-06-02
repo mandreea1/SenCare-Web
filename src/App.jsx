@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, Routes } from 'react-router-dom';
+import {Route, Routes, useNavigate } from 'react-router-dom';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Login from './pages/Login';
@@ -15,11 +15,18 @@ import EditPacient from './pages/doctor/EditPacient';
 import DoctorProfilePage from './pages/doctor/DoctorProfilePage';
 import FisaMedicalaPacient from './pages/doctor/FisaMedicalaPacient';
 import GraficeEvolutie from './pages/doctor/GraficeEvolutie';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import './App.css';
 
-function App() {
-  const onLogout = () => {};
-  const user = { email: "doctor@email.com" };
+// Creăm un component wrapper pentru a putea utiliza hook-uri
+function AppRoutes() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
   return (
     <div className="App">
       <Routes>
@@ -27,12 +34,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/patient" element={<PatientDashboard />} />
+        <Route path="/patient" element={<PatientDashboard onLogout={handleLogout} />} />
         <Route path="/patient/profile" element={<PatientView />} />
         <Route path="/patient/history" element={<PatientHistory />} />
+        <Route path="/doctor" element={<DoctorDashboard onLogout={handleLogout} user={user} />}></Route>
         
         {/* Nested doctor routes */}
-        <Route path="/doctor" element={<DoctorDashboard onLogout={onLogout} user={user} />}>
+        <Route path="/doctor" element={<DoctorDashboard onLogout={handleLogout} user={user} />}>
           <Route path="add-pacient" element={<AdaugaPacient />} />
           <Route path="pacienti" element={<PacientiDoctor />} />
           <Route path="pacient/:id" element={<PacientDetalii />} />
@@ -42,9 +50,17 @@ function App() {
           <Route path="/doctor/pacient/:id/grafice" element={<GraficeEvolutie />} />
         </Route>
 
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} />} />
       </Routes>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }
 
