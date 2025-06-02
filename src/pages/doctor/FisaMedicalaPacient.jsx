@@ -42,6 +42,12 @@ const [newRecomandare, setNewRecomandare] = useState({
 });
   const [pdfSaved, setPdfSaved] = useState(false);
   const [medicalRecordHistory, setMedicalRecordHistory] = useState([]);
+  const downloadAndShowPdf = async (pdfUrl) => {
+  const response = await fetch(pdfUrl, { credentials: 'include' });
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+};
   
   const navigate = useNavigate();
 
@@ -683,7 +689,7 @@ const handleDeletePdf = async (recordId) => {
           </div>
         </div>
         <div className="fisa-istoric-actions">
-          <button className="btn-view-pdf" onClick={() => handleViewPdf(record.id)}>
+          <button className="btn-view-pdf" onClick={() => downloadAndShowPdf(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf/${record.id}`)}>
             <i className="fas fa-eye"></i> Vizualizează
           </button>
           <button className="btn-delete-pdf" onClick={() => handleDeletePdf(record.id)}>
