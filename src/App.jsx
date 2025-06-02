@@ -32,7 +32,7 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        
+
         {/* Nested doctor routes */}
         <Route path="/doctor" element={<DoctorDashboard onLogout={handleLogout} user={user} />}>
           <Route path="add-pacient" element={<AdaugaPacient />} />
@@ -44,9 +44,8 @@ function AppRoutes() {
           <Route path="/doctor/pacient/:id/grafice" element={<GraficeEvolutie />} />
         </Route>
 
-              {/* Rute pentru pacient (în limba română) */}
+              {/* Rute pentru pacient */}
         <Route path="/pacient" element={<PacientDashboard onLogout={handleLogout} user={user} />} />
-
         {/* Rute pentru admin */}
         <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} />} />
       </Routes>

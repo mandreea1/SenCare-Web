@@ -52,7 +52,7 @@ const Login = () => {
         if (data.userType && data.userType.toLowerCase() === 'doctor') {
           navigate('/doctor');
         } else if (data.userType && data.userType.toLowerCase() === 'pacient') {
-          navigate('/patient');
+          navigate('/pacient');
         } else if (data.userType && data.userType.toLowerCase() === 'admin') {
           navigate('/admin');
         } else {
