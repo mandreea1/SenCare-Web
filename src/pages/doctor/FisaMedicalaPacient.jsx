@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import GraficeEvolutie from './GraficeEvolutie';
 import EcgChart from './EcgChart';
 import axios from 'axios';
-import { jsPDF } from 'jspdf'; // Trebuie adăugat acest import
-import html2canvas from 'html2canvas'; // Trebuie adăugat acest import
 
 function FisaMedicalaPacient() {
   const { id } = useParams();
