@@ -550,6 +550,33 @@ app.get('/api/doctor/pacient/:id/datefiziologice', async (req, res) => {
   }
 });
 
+app.post('/api/doctor/pacient/:id/datefiziologice', async (req, res) => {
+  const { id } = req.params;
+  const { Puls, Temperatura, Umiditate, ECG, Data_timp } = req.body;
+
+  if (!Puls && !Temperatura && !Umiditate && !ECG) {
+    return res.status(400).json({ error: 'Trebuie să trimiți cel puțin o valoare fiziologică.' });
+  }
+
+  try {
+    await new sql.Request()
+      .input('PacientID', sql.Int, id)
+      .input('Puls', sql.Int, Puls ?? null)
+      .input('Temperatura', sql.Float, Temperatura ?? null)
+      .input('Umiditate', sql.Float, Umiditate ?? null)
+      .input('ECG', sql.NVarChar(sql.MAX), ECG ?? null)
+      .input('Data_timp', sql.DateTime, Data_timp ? new Date(Data_timp) : new Date())
+      .query(`
+        INSERT INTO DateFiziologice (PacientID, Puls, Temperatura, Umiditate, ECG, Data_timp)
+        VALUES (@PacientID, @Puls, @Temperatura, @Umiditate, @ECG, @Data_timp)
+      `);
+
+    res.status(201).json({ message: 'Date fiziologice adăugate cu succes.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/doctor/pacient/:id/ecg-ultim', async (req, res) => {
   const { id } = req.params;
   try {
