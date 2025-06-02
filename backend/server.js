@@ -906,13 +906,13 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // GET - Obține istoricul fișelor medicale PDF pentru un pacient
-app.get('api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
+app.get('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
   try {
     const { id } = req.params;
     
     // Aici faci query în baza de date pentru a obține istoricul fișelor PDF
     const query = `
-      SELECT pdfId as id, filepath, description, date, created_at 
+      SELECT pdfId as id, filepath, descriere, date, created_at 
       FROM FiseMedicalePacientPdf_pdf 
       WHERE pacientId = ? 
       ORDER BY created_at DESC
@@ -929,20 +929,20 @@ app.get('api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
 });
 
 // POST - Salvează o fișă medicală PDF pentru un pacient
-router.post('/pacient/:id/medical-records-pdf', upload.single('pdf'), async (req, res) => {
+app.post('/api/doctor/pacient/:id/medical-records-pdf', upload.single('pdf'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { description, date } = req.body;
+    const { descriere, date } = req.body;
     const filepath = req.file.path;
     
     // Aici salvezi în baza de date calea către fișier și metadatele
     const query = `
-      INSERT INTO FiseMedicalePacientPdf_pdf (pacientId, filepath, description, date, created_at) 
+      INSERT INTO FiseMedicalePacientPdf_pdf (pacientId, filepath, descriere, date, created_at) 
       VALUES (?, ?, ?, ?, NOW())
     `;
     
     const connection = await getDbConnection();
-    await connection.execute(query, [id, filepath, description, date]);
+    await connection.execute(query, [id, filepath, descriere, date]);
     
     res.status(201).json({ success: true, message: 'Fișă medicală salvată cu succes' });
   } catch (error) {
@@ -952,7 +952,7 @@ router.post('/pacient/:id/medical-records-pdf', upload.single('pdf'), async (req
 });
 
 // GET - Obține un PDF specific din istoricul fișelor medicale
-app.get('api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res) => {
+app.get('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res) => {
   try {
     const { recordId } = req.params;
     
@@ -981,7 +981,7 @@ app.get('api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res)
 });
 
 // DELETE - Șterge un PDF din istoricul fișelor medicale
-app.delete('api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res) => {
+app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res) => {
   try {
     const { recordId } = req.params;
     

@@ -135,17 +135,19 @@ useEffect(() => {
     }
     fetchRecomandari();
 }, [id]);
- useEffect(() => {
-    async function fetchMedicalRecordHistory() {
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
-        setMedicalRecordHistory(res.data);
-      } catch (err) {
-        console.error('Eroare la încărcarea istoricului fișelor PDF:', err);
-      }
+useEffect(() => {
+  async function fetchMedicalRecordHistory() {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
+      setMedicalRecordHistory(res.data || []);
+    } catch (err) {
+      console.error('Eroare la încărcarea istoricului fișelor PDF:', err);
+      // Setăm un array gol când nu există fișe sau endpoint-ul nu este disponibil
+      setMedicalRecordHistory([]);
     }
-    fetchMedicalRecordHistory();
-  }, [id]);
+  }
+  fetchMedicalRecordHistory();
+}, [id]);
 const handleAddRecomandare = async () => {
   try {
     await axios.post(
@@ -336,39 +338,60 @@ const handleDeleteAlarm = async (alarmaId) => {
   };
 
   // Funcția pentru vizualizarea unui PDF din istoric
-  const handleViewPdf = async (recordId) => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf/${recordId}`,
-        { responseType: 'blob' }
-      );
-      
-      // Creăm un URL pentru blob-ul primit
-      const fileURL = window.URL.createObjectURL(new Blob([response.data]));
-      
-      // Deschidem PDF-ul într-un tab nou
-      window.open(fileURL, '_blank');
-    } catch (err) {
-      console.error('Eroare la deschiderea PDF-ului:', err);
+const handleViewPdf = async (recordId) => {
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf/${recordId}`,
+      { responseType: 'blob' }
+    );
+    
+    // Creăm un URL pentru blob-ul primit
+    const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+    
+    // Deschidem PDF-ul într-un tab nou
+    window.open(fileURL, '_blank');
+  } catch (err) {
+    console.error('Eroare la deschiderea PDF-ului:', err);
+    
+    if (err.response?.status === 404) {
+      alert('Fișa medicală nu a fost găsită pe server. Este posibil să fi fost ștearsă sau mutată.');
+    } else {
       alert('Eroare la deschiderea fișei medicale: ' + (err.message || 'A apărut o eroare necunoscută'));
     }
-  };
+  }
+};
 
-  // Funcția pentru ștergerea unui PDF din istoric
-  const handleDeletePdf = async (recordId) => {
-    if (window.confirm('Sigur doriți să ștergeți această fișă medicală?')) {
+const handleDeletePdf = async (recordId) => {
+  if (window.confirm('Sigur doriți să ștergeți această fișă medicală?')) {
+    try {
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf/${recordId}`);
+      
+      // Abordare optimistă - eliminăm din UI înregistrarea ștearsă imediat
+      setMedicalRecordHistory(prev => prev.filter(record => record.id !== recordId));
+      
+      // Încercăm să reîmprospătăm lista din backend
       try {
-        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf/${recordId}`);
-        
-        // Actualizăm istoricul fișelor medicale
         const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
-        setMedicalRecordHistory(res.data);
-      } catch (err) {
-        console.error('Eroare la ștergerea PDF-ului:', err);
+        if (res.data) {
+          setMedicalRecordHistory(res.data);
+        }
+      } catch (fetchErr) {
+        console.warn('Nu s-a putut actualiza lista de fișe PDF de la server:', fetchErr);
+        // Am folosit deja abordarea optimistă, deci UI-ul este deja actualizat
+      }
+    } catch (err) {
+      console.error('Eroare la ștergerea PDF-ului:', err);
+      
+      if (err.response?.status === 404) {
+        alert('Fișa medicală nu a fost găsită pe server. Lista va fi actualizată.');
+        // Eliminăm din UI înregistrarea care nu mai există pe server
+        setMedicalRecordHistory(prev => prev.filter(record => record.id !== recordId));
+      } else {
         alert('Eroare la ștergerea fișei medicale: ' + (err.message || 'A apărut o eroare necunoscută'));
       }
     }
-  };
+  }
+};
   return (
     <div className="fisa-medicala-container">
       <div className="fisa-medicala-card">
@@ -671,14 +694,15 @@ const handleDeleteAlarm = async (alarmaId) => {
     )}
   </div>
   
-  {/* History of medical records */}
-  <div className="istoric-fise-container">
-    <div className="istoric-fise-header">
-      <h3 className="istoric-fise-title">Istoric Fișe Medicale</h3>
-    </div>
-    
-    <div className="istoric-fise-list">
-      {medicalRecordHistory.map((record) => (
+{/* History of medical records */}
+<div className="istoric-fise-container">
+  <div className="istoric-fise-header">
+    <h3 className="istoric-fise-title">Istoric Fișe Medicale</h3>
+  </div>
+  
+  <div className="istoric-fise-list">
+    {Array.isArray(medicalRecordHistory) && medicalRecordHistory.length > 0 ? (
+      medicalRecordHistory.map((record) => (
         <div key={record.id} className="fisa-istoric-item">
           <div className="fisa-istoric-info">
             <div className="fisa-istoric-data">{record.date}</div>
@@ -696,16 +720,19 @@ const handleDeleteAlarm = async (alarmaId) => {
             </button>
           </div>
         </div>
-      ))}
-      
-      {medicalRecordHistory.length === 0 && (
-        <p>Nu există fișe medicale salvate în istoric.</p>
-      )}
-    </div>
-        <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => navigate(-1)}>
-          Înapoi la pacienți
-        </button>
-      </div>
+      ))
+    ) : (
+      <p className="no-records-message">
+        <i className="fas fa-info-circle"></i> Nu există fișe medicale salvate în istoric. 
+        Puteți crea o nouă fișă apăsând butonul "Salvează Fișă ca PDF" de mai sus.
+      </p>
+    )}
+  </div>
+  
+  <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => navigate(-1)}>
+    Înapoi la pacienți
+  </button>
+</div>
     </div>
   );
 }
