@@ -5,9 +5,19 @@ import axios from 'axios';
 function EditarePacient() {
   const { id } = useParams();
   const [form, setForm] = useState(null);
+  const [initialForm, setInitialForm] = useState(null); // Add initialForm state
   const [mesaj, setMesaj] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Add handleChange function
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prevForm => ({
+      ...prevForm,
+      [name]: value
+    }));
+  };
 
   useEffect(() => {
     async function fetchPacient() {
@@ -16,6 +26,7 @@ function EditarePacient() {
       try {
         const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`);
         setForm(res.data);
+        setInitialForm(res.data); // Save initial data
       } catch (err) {
         setMesaj('Eroare la încărcare: ' + (err.response?.data?.error || err.message));
       } finally {
@@ -25,35 +36,45 @@ function EditarePacient() {
     fetchPacient();
   }, [id]);
 
-  const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-const handleSubmit = async e => {
+ const handleSubmit = async e => {
   e.preventDefault();
   setMesaj('');
   try {
-    // Crează textul pentru istoric comparând valorile vechi cu cele noi
-    const dataActuala = new Date().toLocaleString('ro-RO');
-    const modificari = Object.entries(form)
-      .filter(([key, value]) => value !== form[key] && key !== 'id' && key !== 'PacientID')
-      .map(([key, value]) => `${key}: ${form[key] || '-'} → ${value || '-'}`)
-      .join(', ');
-    
-    const istoricText = `[${dataActuala}] Modificare date pacient: ${modificari}`;
+    const dataActuala = new Date().toLocaleString('ro-RO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
 
-    // Salvează modificările pacientului
-    await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`, form);
-    
-    // Adaugă în istoric
+    // Compare current values (form) with initial values (initialForm)
+    const modificari = Object.entries(form)
+      .filter(([key, value]) => 
+        value !== initialForm[key] && 
+        key !== 'id' && 
+        key !== 'PacientID'
+      )
+      .map(([key, value]) => `${key}: ${initialForm[key] || '-'}`)
+      .join(', ');
+
     if (modificari.length > 0) {
+      const istoricText = `[${dataActuala}] Modificare date medicale - Valori vechi: ${modificari}`;
+
+      // Save patient changes
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}`, form);
+      
+      // Add to history
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/istoric`, {
         istoricpacient: istoricText
       });
-    }
 
-    setMesaj('Datele au fost actualizate cu succes!');
-    setTimeout(() => navigate(-1), 1200);
+      setMesaj('Datele au fost actualizate cu succes!');
+      setTimeout(() => navigate(-1), 1200);
+    } else {
+      setMesaj('Nu s-au detectat modificări.');
+    }
   } catch (err) {
     console.error('Eroare:', err);
     setMesaj('Eroare la actualizare: ' + (err.response?.data?.error || err.message));
