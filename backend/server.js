@@ -680,6 +680,65 @@ app.delete('/api/doctor/pacient/:id/alarme/:alarmaId', async (req, res) => {
   }
 });
 
+// GET - Obține recomandările pentru un pacient
+app.get('/api/doctor/pacient/:id/recomandari', async (req, res) => {
+  try {
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, req.params.id)
+      .query(`
+        SELECT RecomandareID, PacientID, TipRecomandare, DurataZilnica, AlteIndicatii, DataRecomandare
+        FROM Recomandari
+        WHERE PacientID = @PacientID
+        ORDER BY DataRecomandare DESC
+      `);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare la obținerea recomandărilor:', err);
+    res.status(500).json({ error: 'Eroare la obținerea recomandărilor' });
+  }
+});
+
+// POST - Adaugă o recomandare nouă
+app.post('/api/doctor/pacient/:id/recomandari', async (req, res) => {
+  try {
+    const { TipRecomandare, DurataZilnica, AlteIndicatii } = req.body;
+    
+    await new sql.Request()
+      .input('PacientID', sql.Int, req.params.id)
+      .input('TipRecomandare', sql.NVarChar(100), TipRecomandare)
+      .input('DurataZilnica', sql.NVarChar(50), DurataZilnica)
+      .input('AlteIndicatii', sql.NVarChar(MAX), AlteIndicatii)
+      .input('DataRecomandare', sql.DateTime, new Date())
+      .query(`
+        INSERT INTO Recomandari (PacientID, TipRecomandare, DurataZilnica, AlteIndicatii, DataRecomandare)
+        VALUES (@PacientID, @TipRecomandare, @DurataZilnica, @AlteIndicatii, @DataRecomandare)
+      `);
+    
+    res.status(201).json({ message: 'Recomandare adăugată cu succes' });
+  } catch (err) {
+    console.error('Eroare la adăugarea recomandării:', err);
+    res.status(500).json({ error: 'Eroare la adăugarea recomandării' });
+  }
+});
+
+// DELETE - Șterge o recomandare
+app.delete('/api/doctor/pacient/:id/recomandari/:recomandareId', async (req, res) => {
+  try {
+    await new sql.Request()
+      .input('RecomandareID', sql.Int, req.params.recomandareId)
+      .input('PacientID', sql.Int, req.params.id)
+      .query(`
+        DELETE FROM Recomandari
+        WHERE RecomandareID = @RecomandareID AND PacientID = @PacientID
+      `);
+    
+    res.json({ message: 'Recomandare ștearsă cu succes' });
+  } catch (err) {
+    console.error('Eroare la ștergerea recomandării:', err);
+    res.status(500).json({ error: 'Eroare la ștergerea recomandării' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });

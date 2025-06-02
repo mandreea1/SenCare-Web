@@ -31,6 +31,14 @@ const [newAlarm, setNewAlarm] = useState({
   TipAlarma: '',
   Descriere: ''
 });
+
+const [recomandari, setRecomandari] = useState([]);
+const [showRecomandareModal, setShowRecomandareModal] = useState(false);
+const [newRecomandare, setNewRecomandare] = useState({
+  TipRecomandare: '',
+  DurataZilnica: '',
+  AlteIndicatii: ''
+});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -111,6 +119,51 @@ useEffect(() => {
   }
   fetchAlarme();
 }, [id]);
+useEffect(() => {
+  async function fetchRecomandari() {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/recomandari`);
+      setRecomandari(res.data);
+    } catch (err) {
+      console.error('Eroare la încărcarea recomandărilor:', err);
+    }
+  }
+  fetchRecomandari();
+}, [id]);
+const handleAddRecomandare = async () => {
+  try {
+    await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/recomandari`, 
+      newRecomandare
+    );
+    
+    // Reîncarcă recomandările
+    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/recomandari`);
+    setRecomandari(res.data);
+    
+    // Resetează formularul
+    setNewRecomandare({ TipRecomandare: '', DurataZilnica: '', AlteIndicatii: '' });
+    setShowRecomandareModal(false);
+  } catch (err) {
+    console.error('Eroare:', err);
+    alert('Eroare la salvarea recomandării: ' + (err.response?.data?.error || err.message));
+  }
+};
+
+const handleDeleteRecomandare = async (recomandareId) => {
+  if (window.confirm('Sigur doriți să ștergeți această recomandare?')) {
+    try {
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/recomandari/${recomandareId}`);
+      
+      // Reîncarcă recomandările
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/recomandari`);
+      setRecomandari(res.data);
+    } catch (err) {
+      console.error('Eroare:', err);
+      alert('Eroare la ștergerea recomandării: ' + (err.response?.data?.error || err.message));
+    }
+  }
+};
 
 // Adaugă aceste funcții de handler
 const handleAddAlarm = (parameter) => {
@@ -404,6 +457,79 @@ const handleDeleteAlarm = async (alarmaId) => {
         <div className="modal-buttons">
           <button className="btn-primary" onClick={handleSaveAlarm}>Salvează</button>
           <button className="btn-secondary" onClick={() => setShowAlarmModal(false)}>Anulează</button>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+<div className="fisa-section">
+  <b>V. Recomandări</b>
+  <div className="recomandari-list">
+    {recomandari.map((recomandare, idx) => (
+      <div key={idx} className="recomandare-item">
+        <div className="recomandare-header">
+          <span className="recomandare-tip">{recomandare.TipRecomandare}</span>
+          <button 
+            className="btn-delete-recomandare"
+            onClick={() => handleDeleteRecomandare(recomandare.RecomandareID)}
+            title="Șterge recomandarea"
+          >
+            ×
+          </button>
+        </div>
+        <div className="recomandare-detalii">
+          <div><strong>Durata zilnică:</strong> {recomandare.DurataZilnica}</div>
+          <div><strong>Alte indicații:</strong> {recomandare.AlteIndicatii}</div>
+          <div className="recomandare-data">
+            {new Date(recomandare.DataRecomandare).toLocaleString('ro-RO')}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+  <button className="btn-add-recomandare" onClick={() => setShowRecomandareModal(true)}>
+    + Adaugă Recomandare
+  </button>
+
+  {showRecomandareModal && (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3>Adaugă Recomandare</h3>
+        <div className="form-group">
+          <label>Tip Recomandare:</label>
+          <input
+            type="text"
+            value={newRecomandare.TipRecomandare}
+            onChange={(e) => setNewRecomandare({
+              ...newRecomandare,
+              TipRecomandare: e.target.value
+            })}
+          />
+        </div>
+        <div className="form-group">
+          <label>Durata Zilnică:</label>
+          <input
+            type="text"
+            value={newRecomandare.DurataZilnica}
+            onChange={(e) => setNewRecomandare({
+              ...newRecomandare,
+              DurataZilnica: e.target.value
+            })}
+          />
+        </div>
+        <div className="form-group">
+          <label>Alte Indicații:</label>
+          <textarea
+            value={newRecomandare.AlteIndicatii}
+            onChange={(e) => setNewRecomandare({
+              ...newRecomandare,
+              AlteIndicatii: e.target.value
+            })}
+          />
+        </div>
+        <div className="modal-buttons">
+          <button className="btn-primary" onClick={handleAddRecomandare}>Salvează</button>
+          <button className="btn-secondary" onClick={() => setShowRecomandareModal(false)}>Anulează</button>
         </div>
       </div>
     </div>
