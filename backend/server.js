@@ -766,40 +766,47 @@ const crypto = require('crypto');
 // Configurare transport email
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
 
 const resetTokens = new Map(); // Stochează temporar token-urile de resetare
 
-// Endpoint pentru cererea de resetare parolă
 app.post('/api/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
+    console.log('Cerere de resetare pentru email:', email);
 
-    // Verifică dacă există utilizatorul
     const user = await new sql.Request()
       .input('email', sql.NVarChar, email)
-      .query('SELECT * FROM Users WHERE Email = @email');
+      .query('SELECT * FROM Utilizatori WHERE Email = @email');
+
+    console.log('Rezultat căutare user:', user.recordset);
 
     if (user.recordset.length === 0) {
+      console.log('Nu s-a găsit userul');
       return res.status(404).json({ error: 'Nu există cont cu acest email.' });
     }
 
-    // Generează token
     const resetToken = crypto.randomBytes(32).toString('hex');
+    console.log('Token generat:', resetToken);
     
-    // Salvează token-ul în Map cu expirare după 1 oră
     resetTokens.set(resetToken, {
       email: email,
-      expiry: Date.now() + 3600000 // 1 oră
+      expiry: Date.now() + 3600000
     });
 
-    // Trimite email
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-    
+    console.log('URL resetare:', resetUrl);
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -813,11 +820,14 @@ app.post('/api/forgot-password', async (req, res) => {
       `
     };
 
+    console.log('Se încearcă trimiterea emailului...');
     await transporter.sendMail(mailOptions);
+    console.log('Email trimis cu succes');
+
     res.json({ message: 'Email-ul de resetare a fost trimis cu succes.' });
   } catch (err) {
-    console.error('Eroare:', err);
-    res.status(500).json({ error: 'Eroare la procesarea cererii.' });
+    console.error('Eroare la trimiterea emailului:', err);
+    res.status(500).json({ error: 'Eroare la procesarea cererii: ' + err.message });
   }
 });
 
@@ -839,7 +849,7 @@ app.post('/api/reset-password', async (req, res) => {
     await new sql.Request()
       .input('email', sql.NVarChar, tokenData.email)
       .input('password', sql.NVarChar, hashedPassword)
-      .query('UPDATE Users SET Password = @password WHERE Email = @email');
+      .query('UPDATE Utilizatori SET Password = @password WHERE Email = @email');
 
     // Șterge token-ul folosit
     resetTokens.delete(token);
