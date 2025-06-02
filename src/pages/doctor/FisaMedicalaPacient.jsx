@@ -272,70 +272,38 @@ const handleDeleteAlarm = async (alarmaId) => {
 };
 
 
-  // Funcția pentru salvarea fișei medicale ca PDF
-  const handleSavePdf = async () => {
-    try {
-      // Pregătim descrierea PDF-ului
-      const currentDate = new Date().toLocaleDateString('ro-RO');
-      const descriere = `Consultație din ${currentDate}`;
-      
-      // Crează o reprezentare vizuală a elementului pentru PDF
-      const fisaMedicalaElement = document.querySelector('.fisa-medicala-card');
-      
-      if (!fisaMedicalaElement) {
-        throw new Error('Nu s-a găsit elementul fișei medicale');
+const handleSavePdf = async () => {
+  try {
+    // Pregătim descrierea PDF-ului
+    const currentDate = new Date().toLocaleDateString('ro-RO');
+    const descriere = `Consultație din ${currentDate}`;
+
+    // Trimitem doar datele către backend
+    await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`,
+      {
+        pacient,
+        istoric,
+        valoriNormale,
+        alarme: alarmeAvertizari,
+        recomandari,
+        descriere,
+        date: new Date().toISOString()
       }
-      
-      // Capturăm fișa medicală ca imagine
-      const canvas = await html2canvas(fisaMedicalaElement, {
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
-      
-      // Creăm documentul PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png');
-      
-      // Calculăm dimensiunile pentru a se potrivi pe pagina A4
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      
-      // Generăm PDF ca blob pentru a-l trimite la server
-      const pdfBlob = pdf.output('blob');
-      
-      // Creăm un formular pentru a trimite PDF-ul
-      const formData = new FormData();
-      formData.append('pdf', pdfBlob, `fisa_medicala_${id}_${currentDate.replace(/\//g, '_')}.pdf`);
-      formData.append('descriere', descriere);
-      formData.append('date', currentDate);
-      
-      // Trimitem PDF-ul la server
-      await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-      
-      // Actualizăm istoricul fișelor medicale
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
-      setMedicalRecordHistory(res.data);
-      
-      // Afișăm mesajul de succes
-      setPdfSaved(true);
-      setTimeout(() => setPdfSaved(false), 3000); // Ascundem mesajul după 3 secunde
-      
-    } catch (err) {
-      console.error('Eroare la generarea și salvarea PDF-ului:', err);
-      alert('Eroare la salvarea fișei medicale ca PDF: ' + (err.message || 'A apărut o eroare necunoscută'));
-    }
-  };
+    );
+
+    // Actualizăm istoricul fișelor medicale
+    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
+    setMedicalRecordHistory(res.data);
+
+    // Afișăm mesajul de succes
+    setPdfSaved(true);
+    setTimeout(() => setPdfSaved(false), 3000);
+  } catch (err) {
+    console.error('Eroare la generarea și salvarea PDF-ului:', err);
+    alert('Eroare la salvarea fișei medicale ca PDF: ' + (err.message || 'A apărut o eroare necunoscută'));
+  }
+};
 
   // Funcția pentru vizualizarea unui PDF din istoric
 const handleViewPdf = async (recordId) => {

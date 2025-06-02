@@ -928,6 +928,7 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
 // POST - Salvează o fișă medicală PDF pentru un pacient
 app.post('/api/doctor/pacient/:id/medical-records-pdf', upload.single('pdf'), async (req, res) => {
   try {
+    console.log('Body primit:', req.body); // vezi ce primești
     const { id } = req.params;
     const { Descriere, date } = req.body;
     const filepath = req.file.path;
@@ -943,7 +944,7 @@ app.post('/api/doctor/pacient/:id/medical-records-pdf', upload.single('pdf'), as
     res.status(201).json({ success: true, message: 'Fișă medicală salvată cu succes' });
   } catch (error) {
     console.error('Error saving medical record PDF:', error);
-    res.status(500).json({ error: 'Eroare la salvarea fișei medicale' });
+    res.status(500).json({ error: 'Eroare la generarea PDF-ului', details: err.message });
   }
 });
 
