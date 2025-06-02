@@ -269,7 +269,7 @@ const downloadAndShowPdf = async (pdfId) => {
                   </div>
                 </div>
                 <div className="fisa-istoric-actions">
-                  <button className="btn-view-pdf" onClick={() => downloadAndShowPdf(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${user?.userId}/medical-records-pdf/${record.id}`)}>
+                  <button className="btn-view-pdf" onClick={() => downloadAndShowPdf(record.id)}>
                     <i className="fas fa-eye"></i> Vizualizează
                   </button>
                 </div>

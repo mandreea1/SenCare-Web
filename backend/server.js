@@ -1182,6 +1182,41 @@ app.get('/api/pacient/medical-records-pdf/:recordId', async (req, res) => {
   }
 });
 
+app.get('/api/pacient/ecg-ultim', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    const pacientId = pacient.recordset[0].PacientID;
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .query('SELECT TOP 1 ECG FROM Masuratori WHERE PacientID = @PacientID ORDER BY DataMasurare DESC');
+    if (!result.recordset.length) return res.json({});
+    res.json(result.recordset[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/pacient/datefiziologice', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    const pacientId = pacient.recordset[0].PacientID;
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .query('SELECT * FROM Masuratori WHERE PacientID = @PacientID ORDER BY DataMasurare DESC');
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
