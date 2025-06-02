@@ -1,7 +1,6 @@
 console.log('Pornire server.js...');
 require('dotenv').config();
 const express = require('express');
-const multer = require('multer');
 const fs = require('fs');
 const router = express.Router();
 const cors = require('cors');
@@ -904,7 +903,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage,fileSize: 50 * 1024 * 1024 });
+
 
 // GET - Obține istoricul fișelor medicale PDF pentru un pacient
 app.get('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
@@ -1022,6 +1021,32 @@ app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, 
   } catch (error) {
     console.error('Error deleting medical record PDF:', error);
     res.status(500).json({ error: 'Eroare la ștergerea fișei medicale' });
+  }
+});
+
+const multer = require('multer');
+const upload = multer({ dest: path.join(__dirname, '../uploads/medical-records') });
+
+app.post('/api/doctor/pacient/:id/medical-records-pdf-upload', upload.single('pdf'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { descriere, date } = req.body;
+    const filePath = req.file.path;
+
+    await new sql.Request()
+      .input('pacientId', sql.Int, id)
+      .input('FilePath', sql.NVarChar(500), filePath)
+      .input('Descriere', sql.NVarChar(500), descriere)
+      .input('date', sql.NVarChar(50), date)
+      .query(`
+        INSERT INTO FiseMedicalePacientPdf (pacientId, FilePath, Descriere, date, created_at) 
+        VALUES (@pacientId, @FilePath, @Descriere, @date, GETDATE())
+      `);
+
+    res.status(201).json({ success: true, message: 'Fișă medicală PDF salvată cu succes' });
+  } catch (error) {
+    console.error('Error saving uploaded PDF:', error);
+    res.status(500).json({ error: 'Eroare la salvarea PDF-ului', details: error.message });
   }
 });
 

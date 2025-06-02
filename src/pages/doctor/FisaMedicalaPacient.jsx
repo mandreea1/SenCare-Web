@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import GraficeEvolutie from './GraficeEvolutie';
 import EcgChart from './EcgChart';
 import axios from 'axios';
+import html2pdf from 'html2pdf.js';
 
 function FisaMedicalaPacient() {
   const { id } = useParams();
@@ -269,6 +270,37 @@ const handleDeleteAlarm = async (alarmaId) => {
   }
 };
 
+const handleSavePdfWithHistory = async () => {
+  try {
+    const element = document.querySelector('.fisa-medicala-card');
+    const opt = { margin: 0.5, filename: 'fisa-medicala.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+
+    // Creează PDF și obține blob-ul corect
+    const worker = html2pdf().from(element).set(opt);
+    const pdfBlob = await worker.outputPdf('blob'); // sau: await worker.output('blob');
+
+    const formData = new FormData();
+    formData.append('pdf', pdfBlob, 'fisa-medicala.pdf');
+    formData.append('descriere', `Consultație din ${new Date().toLocaleDateString('ro-RO')}`);
+    formData.append('date', new Date().toISOString());
+
+    await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf-upload`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+
+    // Actualizează istoricul
+    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
+    setMedicalRecordHistory(res.data);
+
+    setPdfSaved(true);
+    setTimeout(() => setPdfSaved(false), 3000);
+  } catch (err) {
+    console.error('Eroare la generarea și salvarea PDF-ului:', err);
+    alert('Eroare la salvarea fișei medicale ca PDF: ' + (err.message || 'A apărut o eroare necunoscută'));
+  }
+};
 
 const handleSavePdf = async () => {
   try {
@@ -644,12 +676,12 @@ const handleDeletePdf = async (recordId) => {
   )}
 </div>
 <button 
-      className="btn-save-pdf"
-      onClick={handleSavePdf}
-    >
-      <i className="fas fa-file-pdf"></i>
-      Salvează Fișă ca PDF
-    </button>
+  className="btn-save-pdf"
+  onClick={handleSavePdfWithHistory}
+>
+  <i className="fas fa-file-pdf"></i>
+  Salvează Fișă ca PDF
+</button>
     
     {/* Success message that appears after saving */}
     {pdfSaved && (
