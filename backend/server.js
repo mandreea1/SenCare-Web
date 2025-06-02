@@ -945,6 +945,7 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res
       return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
     }
     const filepath = result.recordset[0].FilePath;
+    res.setHeader('Content-Type', 'application/pdf'); // <-- Adaugă această linie
     res.sendFile(path.resolve(filepath));
   } catch (error) {
     console.error('Error retrieving medical record PDF:', error);
