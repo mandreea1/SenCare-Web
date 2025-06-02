@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import GraficeEvolutie from './GraficeEvolutie';
 import EcgChart from './EcgChart';
 import axios from 'axios';
+import { jsPDF } from 'jspdf'; // Trebuie adăugat acest import
+import html2canvas from 'html2canvas'; // Trebuie adăugat acest import
 
 function FisaMedicalaPacient() {
   const { id } = useParams();
@@ -39,6 +41,9 @@ const [newRecomandare, setNewRecomandare] = useState({
   DurataZilnica: '',
   AlteIndicatii: ''
 });
+  const [pdfSaved, setPdfSaved] = useState(false);
+  const [medicalRecordHistory, setMedicalRecordHistory] = useState([]);
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -130,6 +135,17 @@ useEffect(() => {
     }
     fetchRecomandari();
 }, [id]);
+ useEffect(() => {
+    async function fetchMedicalRecordHistory() {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
+        setMedicalRecordHistory(res.data);
+      } catch (err) {
+        console.error('Eroare la încărcarea istoricului fișelor PDF:', err);
+      }
+    }
+    fetchMedicalRecordHistory();
+  }, [id]);
 const handleAddRecomandare = async () => {
   try {
     await axios.post(
@@ -252,6 +268,107 @@ const handleDeleteAlarm = async (alarmaId) => {
     }
   }
 };
+
+
+  // Funcția pentru salvarea fișei medicale ca PDF
+  const handleSavePdf = async () => {
+    try {
+      // Pregătim descrierea PDF-ului
+      const currentDate = new Date().toLocaleDateString('ro-RO');
+      const descriere = `Consultație din ${currentDate}`;
+      
+      // Crează o reprezentare vizuală a elementului pentru PDF
+      const fisaMedicalaElement = document.querySelector('.fisa-medicala-card');
+      
+      if (!fisaMedicalaElement) {
+        throw new Error('Nu s-a găsit elementul fișei medicale');
+      }
+      
+      // Capturăm fișa medicală ca imagine
+      const canvas = await html2canvas(fisaMedicalaElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
+      
+      // Creăm documentul PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Calculăm dimensiunile pentru a se potrivi pe pagina A4
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      // Generăm PDF ca blob pentru a-l trimite la server
+      const pdfBlob = pdf.output('blob');
+      
+      // Creăm un formular pentru a trimite PDF-ul
+      const formData = new FormData();
+      formData.append('pdf', pdfBlob, `fisa_medicala_${id}_${currentDate.replace(/\//g, '_')}.pdf`);
+      formData.append('descriere', descriere);
+      formData.append('date', currentDate);
+      
+      // Trimitem PDF-ul la server
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+      
+      // Actualizăm istoricul fișelor medicale
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
+      setMedicalRecordHistory(res.data);
+      
+      // Afișăm mesajul de succes
+      setPdfSaved(true);
+      setTimeout(() => setPdfSaved(false), 3000); // Ascundem mesajul după 3 secunde
+      
+    } catch (err) {
+      console.error('Eroare la generarea și salvarea PDF-ului:', err);
+      alert('Eroare la salvarea fișei medicale ca PDF: ' + (err.message || 'A apărut o eroare necunoscută'));
+    }
+  };
+
+  // Funcția pentru vizualizarea unui PDF din istoric
+  const handleViewPdf = async (recordId) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf/${recordId}`,
+        { responseType: 'blob' }
+      );
+      
+      // Creăm un URL pentru blob-ul primit
+      const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+      
+      // Deschidem PDF-ul într-un tab nou
+      window.open(fileURL, '_blank');
+    } catch (err) {
+      console.error('Eroare la deschiderea PDF-ului:', err);
+      alert('Eroare la deschiderea fișei medicale: ' + (err.message || 'A apărut o eroare necunoscută'));
+    }
+  };
+
+  // Funcția pentru ștergerea unui PDF din istoric
+  const handleDeletePdf = async (recordId) => {
+    if (window.confirm('Sigur doriți să ștergeți această fișă medicală?')) {
+      try {
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf/${recordId}`);
+        
+        // Actualizăm istoricul fișelor medicale
+        const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
+        setMedicalRecordHistory(res.data);
+      } catch (err) {
+        console.error('Eroare la ștergerea PDF-ului:', err);
+        alert('Eroare la ștergerea fișei medicale: ' + (err.message || 'A apărut o eroare necunoscută'));
+      }
+    }
+  };
   return (
     <div className="fisa-medicala-container">
       <div className="fisa-medicala-card">
@@ -537,6 +654,54 @@ const handleDeleteAlarm = async (alarmaId) => {
     </div>
   )}
 </div>
+<button 
+      className="btn-save-pdf"
+      onClick={handleSavePdf}
+    >
+      <i className="fas fa-file-pdf"></i>
+      Salvează Fișă ca PDF
+    </button>
+    
+    {/* Success message that appears after saving */}
+    {pdfSaved && (
+      <div className="pdf-saved-message">
+        <i className="fas fa-check-circle"></i>
+        Fișa medicală a fost salvată cu succes!
+      </div>
+    )}
+  </div>
+  
+  {/* History of medical records */}
+  <div className="istoric-fise-container">
+    <div className="istoric-fise-header">
+      <h3 className="istoric-fise-title">Istoric Fișe Medicale</h3>
+    </div>
+    
+    <div className="istoric-fise-list">
+      {medicalRecordHistory.map((record) => (
+        <div key={record.id} className="fisa-istoric-item">
+          <div className="fisa-istoric-info">
+            <div className="fisa-istoric-data">{record.date}</div>
+            <div className="fisa-istoric-detalii">
+              Fișa medicală - {record.descriere}
+            </div>
+          </div>
+          
+          <div className="fisa-istoric-actions">
+            <button className="btn-view-pdf" onClick={() => handleViewPdf(record.id)}>
+              <i className="fas fa-eye"></i> Vizualizează
+            </button>
+            <button className="btn-delete-pdf" onClick={() => handleDeletePdf(record.id)}>
+              <i className="fas fa-trash"></i> Șterge
+            </button>
+          </div>
+        </div>
+      ))}
+      
+      {medicalRecordHistory.length === 0 && (
+        <p>Nu există fișe medicale salvate în istoric.</p>
+      )}
+    </div>
         <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => navigate(-1)}>
           Înapoi la pacienți
         </button>
