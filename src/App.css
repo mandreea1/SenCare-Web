@@ -988,6 +988,15 @@ input, textarea {
   margin: 0 auto;
 }
 
+.welcome-content img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: transparent !important; /* Asigură transparența */
+  mix-blend-mode: multiply; /* Ajută la eliminarea fundalului alb */
+  filter: drop-shadow(0 0 1px rgba(36, 116, 181, 0.2)); /* Adaugă un efect subtil */
+}
+
 .welcome-content h1 {
   font-size: clamp(2.5rem, 5vw, 3.8rem);
   margin-bottom: 1.8rem;
