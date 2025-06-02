@@ -43,6 +43,13 @@ export default function DoctorDashboard({ onLogout, user }) {
     fetchDoctorData();
   }, [user]);
 
+  const renderErrorMessage = () => {
+    if (error) {
+      return <div className="error-message">{error}</div>;
+    }
+    return null;
+  };
+
   return (
     <div>
       {/* Bara de navigare sus */}
@@ -82,10 +89,12 @@ export default function DoctorDashboard({ onLogout, user }) {
         {isDashboard && (
   <div className="welcome-banner">
     <div className="welcome-content">
+      {renderErrorMessage()}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
         <h1 style={{ margin: 0 }}>Bun venit la SenCare!</h1>
         <img
           src={logo}
+          alt="SenCare"
           style={{
             width: 60,
             height: 60,
