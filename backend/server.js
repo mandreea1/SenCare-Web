@@ -1040,6 +1040,148 @@ app.get('/api/pacient/profil', async (req, res) => {
   }
 });
 
+// GET profil pacient
+app.get('/api/pacient/profil', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const result = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query(`
+        SELECT p.PacientID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca,
+               u.Email, dm.IstoricMedical, dm.Alergii, dm.ConsultatiiCardiologice
+        FROM Pacienti p
+        INNER JOIN Utilizatori u ON p.UserID = u.UserID
+        LEFT JOIN DateMedicale dm ON p.PacientID = dm.PacientID
+        WHERE p.UserID = @UserID
+      `);
+    if (!result.recordset.length) return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    res.json(result.recordset[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET istoric pacient
+app.get('/api/pacient/istoric', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.json([]);
+    const pacientId = pacient.recordset[0].PacientID;
+    const istoric = await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .query('SELECT istoricpacient FROM istoric WHERE pacientid = @PacientID');
+    res.json(istoric.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET valori normale pacient
+app.get('/api/pacient/valorinormale', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.json({});
+    const pacientId = pacient.recordset[0].PacientID;
+    const result = await new sql.Request()
+      .input('PacientId', sql.Int, pacientId)
+      .query('SELECT * FROM valorinormalepacient WHERE PacientId = @PacientId');
+    if (!result.recordset.length) return res.json({});
+    res.json(result.recordset[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET alarme pacient
+app.get('/api/pacient/alarme', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.json([]);
+    const pacientId = pacient.recordset[0].PacientID;
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .query('SELECT AlarmaID, PacientID, TipAlarma, Descriere FROM AlarmeAvertizari WHERE PacientID = @PacientID');
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET recomandari pacient
+app.get('/api/pacient/recomandari', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.json([]);
+    const pacientId = pacient.recordset[0].PacientID;
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .query('SELECT * FROM RecomandariMedicale WHERE PacientID = @PacientID ORDER BY DataRecomandare DESC');
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET istoric fisiere medicale PDF pacient
+app.get('/api/pacient/medical-records-pdf', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.json([]);
+    const pacientId = pacient.recordset[0].PacientID;
+    const result = await new sql.Request()
+      .input('pacientId', sql.Int, pacientId)
+      .query(`
+        SELECT pdfId as id, FilePath, Descriere, date, created_at 
+        FROM FiseMedicalePacientPdf 
+        WHERE pacientId = @pacientId 
+        ORDER BY created_at DESC
+      `);
+    res.json(result.recordset);
+  } catch (error) {
+    res.status(500).json({ error: 'Eroare la obținerea istoricului fișelor medicale' });
+  }
+});
+
+// GET download PDF pacient
+app.get('/api/pacient/medical-records-pdf/:recordId', async (req, res) => {
+  const { userId } = req.query;
+  const { recordId } = req.params;
+  try {
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    const pacientId = pacient.recordset[0].PacientID;
+    const result = await new sql.Request()
+      .input('pdfId', sql.Int, recordId)
+      .input('pacientId', sql.Int, pacientId)
+      .query('SELECT FilePath FROM FiseMedicalePacientPdf WHERE pdfId = @pdfId AND pacientId = @pacientId');
+    if (!result.recordset.length) {
+      return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
+    }
+    const filepath = result.recordset[0].FilePath;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.sendFile(path.resolve(filepath));
+  } catch (error) {
+    res.status(500).json({ error: 'Eroare la obținerea fișei medicale' });
+  }
+});
+
 
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
