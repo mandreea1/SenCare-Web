@@ -913,7 +913,7 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
     const result = await new sql.Request()
       .input('pacientId', sql.Int, id)
       .query(`
-        SELECT pdfId as id, filepath, descriere, date, created_at 
+        SELECT pdfId as id, FilePath, Descriere, date, created_at 
         FROM FiseMedicalePacientPdf_pdf 
         WHERE pacientId = @pacientId 
         ORDER BY created_at DESC
@@ -929,16 +929,16 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
 app.post('/api/doctor/pacient/:id/medical-records-pdf', upload.single('pdf'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { descriere, date } = req.body;
+    const { Descriere, date } = req.body;
     const filepath = req.file.path;
     await new sql.Request()
       .input('pacientId', sql.Int, id)
-      .input('filepath', sql.NVarChar(500), filepath)
-      .input('descriere', sql.NVarChar(500), descriere)
+      .input('FilePath', sql.NVarChar(500), filepath)
+      .input('Descriere', sql.NVarChar(500), Descriere)
       .input('date', sql.NVarChar(50), date)
       .query(`
-        INSERT INTO FiseMedicalePacientPdf_pdf (pacientId, filepath, descriere, date, created_at) 
-        VALUES (@pacientId, @filepath, @descriere, @date, GETDATE())
+        INSERT INTO FiseMedicalePacientPdf_pdf (pacientId, FilePath, Descriere, date, created_at) 
+        VALUES (@pacientId, @FilePath, @Descriere, @date, GETDATE())
       `);
     res.status(201).json({ success: true, message: 'Fișă medicală salvată cu succes' });
   } catch (error) {
@@ -953,11 +953,11 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res
     const { recordId } = req.params;
     const result = await new sql.Request()
       .input('pdfId', sql.Int, recordId)
-      .query('SELECT filepath FROM FiseMedicalePacientPdf_pdf WHERE pdfId = @pdfId');
+      .query('SELECT FilePath FROM FiseMedicalePacientPdf_pdf WHERE pdfId = @pdfId');
     if (!result.recordset.length) {
       return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
     }
-    const filepath = result.recordset[0].filepath;
+    const filepath = result.recordset[0].FilePath;
     if (!fs.existsSync(filepath)) {
       return res.status(404).json({ error: 'Fișierul PDF nu a fost găsit' });
     }
@@ -974,7 +974,7 @@ app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, 
     const { recordId } = req.params;
     const result = await new sql.Request()
       .input('pdfId', sql.Int, recordId)
-      .query('SELECT filepath FROM FiseMedicalePacientPdf_pdf WHERE pdfId = @pdfId');
+      .query('SELECT FilePath FROM FiseMedicalePacientPdf_pdf WHERE pdfId = @pdfId');
     if (!result.recordset.length) {
       return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
     }
