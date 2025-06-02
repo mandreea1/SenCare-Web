@@ -481,7 +481,9 @@ const handleDeleteAlarm = async (alarmaId) => {
           <div><strong>Durata zilnică:</strong> {recomandare.DurataZilnica}</div>
           <div><strong>Alte indicații:</strong> {recomandare.AlteIndicatii}</div>
           <div className="recomandare-data">
-            {new Date(recomandare.DataRecomandare).toLocaleString('ro-RO')}
+            {new Date(recomandare.DataRecomandare).toLocaleString('ro-RO', {
+    timeZone: 'Europe/Bucharest'
+})}
           </div>
         </div>
       </div>
