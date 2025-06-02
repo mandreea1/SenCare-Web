@@ -976,7 +976,7 @@ app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, 
   }
 });
 
-app.get('/api/pacient/profile', async (req, res) => {
+app.get('/api/pacient/profil', async (req, res) => {
   const { userId, email } = req.query;
   if (!userId && !email) {
     return res.status(400).json({ error: 'Trebuie să trimiți userId sau email.' });
