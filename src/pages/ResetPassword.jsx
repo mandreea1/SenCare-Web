@@ -9,7 +9,6 @@ function ResetPassword() {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useParams();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
   e.preventDefault();

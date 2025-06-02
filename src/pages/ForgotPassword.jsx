@@ -11,7 +11,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   setIsLoading(true);
   try {
-    const response = await axios({
+    await axios({
       method: 'post',
       url: `${process.env.REACT_APP_BACKEND_URL}/api/forgot-password`,
       data: { email },
