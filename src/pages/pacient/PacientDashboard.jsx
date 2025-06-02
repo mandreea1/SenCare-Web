@@ -24,7 +24,7 @@ export default function PacientDashboard({ onLogout, user }) {
           return;
         }
         const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-        const res = await fetch(`${BACKEND_URL}/api/pacient/profile?userId=${userId}`);
+        const res = await fetch(`${BACKEND_URL}/api/pacient/profil?userId=${userId}`);
         if (!res.ok) throw new Error('Eroare la profil pacient');
         const data = await res.json();
         if (!data || !data.Nume) {
