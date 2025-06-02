@@ -64,8 +64,8 @@ export default function PacientDashboard({ onLogout }) {
   </div>
   <div className="right-icons">
     {/* Buton nou pentru fișe medicale */}
-    <Link to="/pacient/medical-records-pdf" className="icon-btn" title="Fișe medicale">
-      Fișe medicale
+    <Link to="/pacient/medical-records-pdf" className="nav-link">
+      <i className="fas fa-file-medical"></i> Fișe medicale
     </Link>
     <button className="icon-btn" title="Profil" onClick={() => navigate('/pacient/profil')}>
       <FaUserCircle />
