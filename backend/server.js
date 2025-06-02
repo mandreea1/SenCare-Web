@@ -990,7 +990,11 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res
       return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
     }
     const filepath = result.recordset[0].FilePath;
-    res.download(path.resolve(filepath)); // <<-- folosește download pentru a forța salvarea
+    const filename = filepath.split(/[\\/]/).pop(); // extrage doar numele fișierului
+
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.sendFile(path.resolve(filepath));
   } catch (error) {
     console.error('Error retrieving medical record PDF:', error);
     res.status(500).json({ error: 'Eroare la obținerea fișei medicale' });
