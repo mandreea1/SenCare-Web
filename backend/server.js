@@ -501,7 +501,7 @@ app.get('/api/doctor/pacient/:id/ecg-ultim', async (req, res) => {
   }
 });
 
-app.get('/pacient/:id/valorinormale', async (req, res) => {
+app.get('/doctor/pacient/:id/valorinormale', async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query('SELECT * FROM valorinormalepacient WHERE PacientId = ?', [id]);
@@ -513,7 +513,7 @@ app.get('/pacient/:id/valorinormale', async (req, res) => {
 });
 
 // POST/PUT valorile normale pentru un pacient
-app.post('/pacient/:id/valorinormale', async (req, res) => {
+app.post('/doctor/pacient/:id/valorinormale', async (req, res) => {
   try {
     const { id } = req.params;
     const {
