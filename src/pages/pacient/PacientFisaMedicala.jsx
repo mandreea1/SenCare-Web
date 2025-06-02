@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import GraficeEvolutie from '../doctor/GraficeEvolutie';
-import EcgChart from '../doctor/EcgChart';
+import GraficeEvolutie1 from './GraficeEvolutie1';
+import EcgChart1 from './EcgChart1';
 import axios from 'axios';
 
 function PacientFisaMedicala() {
@@ -47,6 +47,7 @@ useEffect(() => {
   async function fetchEcg() {
     try {
       const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/pacient/ecg-ultim?userId=${user?.userId}`);
+      console.log('ECG response:', res.data); // <-- aici vezi ce primești de la backend
       const ecgArray = res.data?.ECG
         ? res.data.ECG.split(',').map(val => Number(val.trim()))
         : [];
@@ -145,8 +146,8 @@ const downloadAndShowPdf = async (pdfId) => {
         <div className="fisa-section">
           <b>II. Grafice evoluție</b>
           <div style={{ marginTop: 16 }}>
-            <GraficeEvolutie id={pacient.PacientID || pacient.id || user?.userId} />
-            <EcgChart ecgString={ecgStringDinBackendSauUltimaMasurare} />
+            <GraficeEvolutie1 userId={user?.userId} />
+            <EcgChart1 ecgString={ecgStringDinBackendSauUltimaMasurare} />
           </div>
         </div>
         <div className="fisa-section">

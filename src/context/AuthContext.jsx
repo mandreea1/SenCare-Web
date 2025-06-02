@@ -4,25 +4,30 @@ import React, { createContext, useState, useContext } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  // Încarcă userul din localStorage la inițializare
+const [user, setUser] = useState(() => {
+  const stored = sessionStorage.getItem('user');
+  return stored ? JSON.parse(stored) : null;
+});
+const [token, setToken] = useState(() => {
+  return sessionStorage.getItem('token') || null;
+});
 
-  // Funcția de login
-  const login = async (userData) => {
-    setUser({
-      userId: userData.userId,
-      email: userData.email,
-      userType: userData.userType
-    });
-    setToken(userData.token || 'temp-token');
-    return userData.userType;
-  };
+const login = async (userData) => {
+  const userObj = { userId: userData.userId, email: userData.email, userType: userData.userType };
+  setUser(userObj);
+  setToken(userData.token || 'temp-token');
+  sessionStorage.setItem('user', JSON.stringify(userObj));
+  sessionStorage.setItem('token', userData.token || 'temp-token');
+  return userData.userType;
+};
 
-  // Funcția de logout
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-  };
+const logout = () => {
+  setUser(null);
+  setToken(null);
+  sessionStorage.removeItem('user');
+  sessionStorage.removeItem('token');
+};
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>

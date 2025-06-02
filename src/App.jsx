@@ -16,6 +16,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import PacientDashboard from './pages/pacient/PacientDashboard';
 import PacientProfilePage from './pages/pacient/PacientProfilePage';
 import PacientFisaMedicala from './pages/pacient/PacientFisaMedicala';
+import GraficeEvolutie1 from './pages/pacient/GraficeEvolutie1';
 import './App.css';
 
 // Creăm un component wrapper pentru a putea utiliza hook-uri
@@ -50,6 +51,7 @@ function AppRoutes() {
           <Route path="/pacient" element={<PacientDashboard onLogout={handleLogout} user={user} />}>
             <Route path="profil" element={<PacientProfilePage user={user} />} />
             <Route path="medical-records-pdf" element={<PacientFisaMedicala />} />
+            <Route path="/pacient/grafice" element={<GraficeEvolutie1 userId={user?.userId} />} />
           </Route>
         {/* Rute pentru admin */}
         <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} />} />
