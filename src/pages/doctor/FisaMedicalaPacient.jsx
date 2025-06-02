@@ -120,15 +120,15 @@ useEffect(() => {
   fetchAlarme();
 }, [id]);
 useEffect(() => {
-  async function fetchRecomandari() {
-    try {
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/recomandari`);
-      setRecomandari(res.data);
-    } catch (err) {
-      console.error('Eroare la încărcarea recomandărilor:', err);
+    async function fetchRecomandari() {
+        try {
+            const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/recomandari`);
+            setRecomandari(res.data);
+        } catch (err) {
+            console.error('Eroare la încărcarea recomandărilor:', err);
+        }
     }
-  }
-  fetchRecomandari();
+    fetchRecomandari();
 }, [id]);
 const handleAddRecomandare = async () => {
   try {
