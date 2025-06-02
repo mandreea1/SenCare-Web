@@ -987,19 +987,19 @@ app.get('/api/pacient/profile', async (req, res) => {
     if (userId) {
       result = await sql.query`
         SELECT 
-          u.UserID, u.Email, u.UserType, 
-          p.PacientID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca
-        FROM Utilizatori u
-        INNER JOIN Pacienti p ON u.UserID = p.UserID
-        WHERE u.UserID = ${userId} AND u.UserType = 'Pacient'
+          p.PacientID, p.UserID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca,
+          u.Email, u.UserType
+        FROM Pacienti p
+        INNER JOIN Utilizatori u ON p.UserID = u.UserID
+        WHERE p.UserID = ${userId} AND u.UserType = 'Pacient'
       `;
     } else {
       result = await sql.query`
         SELECT 
-          u.UserID, u.Email, u.UserType, 
-          p.PacientID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca
-        FROM Utilizatori u
-        INNER JOIN Pacienti p ON u.UserID = p.UserID
+          p.PacientID, p.UserID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca,
+          u.Email, u.UserType
+        FROM Pacienti p
+        INNER JOIN Utilizatori u ON p.UserID = u.UserID
         WHERE u.Email = ${email} AND u.UserType = 'Pacient'
       `;
     }
