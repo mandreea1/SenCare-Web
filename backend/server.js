@@ -1,7 +1,46 @@
 console.log('Pornire server.js...');
+require('dotenv').config();
 const express = require('express');
-const { connectToDb, sql} = require('./db');
+const cors = require('cors');
+const { connectToDb, sql } = require('./db');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const path = require('path');
+const resetTokens = new Map();
+
+const requiredEnvVars = ['EMAIL_USER', 'EMAIL_PASS', 'FRONTEND_URL'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error('Lipsesc următoarele variabile de mediu:', missingEnvVars.join(', '));
+  process.exit(1);
+}
+
+const emailConfig = {
+  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+};
+
+const transporter = nodemailer.createTransport(emailConfig);
+
+// Verifică configurația email la pornire
+transporter.verify()
+  .then(() => console.log('Configurare email reușită'))
+  .catch(err => {
+    console.error('Eroare configurare email:', err);
+    process.exit(1);
+  });
+
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -10,18 +49,18 @@ const bcrypt = require('bcryptjs');
 const cors = require('cors');
 
 const corsOptions = {
-  origin: ['https://blue-dune-02cbb2810.6.azurestaticapps.net', // Pune aici URL-ul exact al SWA
-  'http://localhost:3000'],
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://sencareapp-backend.azurewebsites.net'],
+  origin: [
+    'https://blue-dune-02cbb2810.6.azurestaticapps.net',
+    'http://localhost:3000',
+    'https://sencareapp-backend.azurewebsites.net'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
 
 // // Servește build-ul React ca fișiere statice
 // app.use(express.static(path.join(__dirname, '../build')));
@@ -760,25 +799,7 @@ app.delete('/api/doctor/pacient/:id/recomandari/:recomandareId', async (req, res
     }
 });
 
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
 
-// Configurare transport email
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
-
-const resetTokens = new Map(); // Stochează temporar token-urile de resetare
 
 app.post('/api/forgot-password', async (req, res) => {
   try {
@@ -864,6 +885,15 @@ app.post('/api/reset-password', async (req, res) => {
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });
+
+app.use((err, req, res, next) => {
+  console.error('Eroare globală:', err);
+  res.status(500).json({
+    error: 'A apărut o eroare internă',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Încercați din nou mai târziu'
+  });
+});
+
 connectToDb().then(() => {
   app.listen(PORT, () => {
     console.log(`Serverul rulează pe http://localhost:${PORT}`);
