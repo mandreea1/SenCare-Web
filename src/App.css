@@ -819,3 +819,71 @@ input, textarea {
   font-size: 0.9em;
   color: #444;
 }
+
+.recomandari-list {
+  margin-top: 16px;
+}
+
+.recomandare-item {
+  padding: 16px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.recomandare-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.recomandare-tip {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.btn-delete-recomandare {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.7;
+}
+
+.btn-delete-recomandare:hover {
+  opacity: 1;
+  color: #ff4444;
+}
+
+.recomandare-detalii {
+  font-size: 0.9em;
+  color: #444;
+}
+
+.recomandare-detalii > div {
+  margin: 4px 0;
+}
+
+.recomandare-data {
+  color: #666;
+  font-size: 0.8em;
+  margin-top: 8px;
+}
+
+.btn-add-recomandare {
+  width: 100%;
+  padding: 8px;
+  margin-top: 16px;
+  background: #f0f0f0;
+  border: 1px dashed #999;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-add-recomandare:hover {
+  background: #e0e0e0;
+}
