@@ -504,11 +504,13 @@ app.get('/api/doctor/pacient/:id/ecg-ultim', async (req, res) => {
 app.get('/api/doctor/pacient/:id/valorinormale', async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await db.query('SELECT * FROM valorinormalepacient WHERE PacientId = ?', [id]);
-    if (rows.length === 0) return res.json({});
-    res.json(rows[0]);
+    const result = await new sql.Request()
+      .input('PacientId', sql.Int, id)
+      .query('SELECT * FROM valorinormalepacient WHERE PacientId = @PacientId');
+    if (!result.recordset.length) return res.json({});
+    res.json(result.recordset[0]);
   } catch (err) {
-    console.error('Eroare SQL valorinormale:', err); // <-- adaugă asta
+    console.error('Eroare SQL valorinormale:', err);
     res.status(500).json({ error: 'Eroare la interogare valori normale.' });
   }
 });
