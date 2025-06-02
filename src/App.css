@@ -1355,3 +1355,28 @@ input, textarea {
     padding: 8px 8px;
   }
 }
+
+.profile-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+.profile-title {
+  border-bottom: 4px solid #4285f4;
+  padding-bottom: 10px;
+  margin-bottom: 24px;
+  font-size: 2rem;
+}
+
+.profile-box {
+  background: #fff;
+  border: 1.5px solid #4285f4;
+  border-radius: 12px;
+  padding: 28px 24px;
+  box-shadow: 0 2px 12px rgba(66,133,244,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 1.1rem;
+}

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 function PacientiDoctor() {
-  const doctorEmail = localStorage.getItem('email');
+  const { user } = useAuth();
+  const doctorEmail = user?.email;
   const [pacienti, setPacienti] = useState([]);
   const [mesaj, setMesaj] = useState('');
   const navigate = useNavigate();

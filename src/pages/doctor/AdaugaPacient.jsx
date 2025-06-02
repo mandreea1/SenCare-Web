@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 function AdaugaPacient() {
-  const doctorEmail = localStorage.getItem('email');
+  const { user } = useAuth();
+  const doctorEmail = user?.email;
   const [form, setForm] = useState({
     Email: '',
     password: '',

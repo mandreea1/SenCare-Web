@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 export default function DoctorProfilePage() {
+   const { user } = useAuth();
   const [doctor, setDoctor] = useState(null);
   const [originalDoctor, setOriginalDoctor] = useState(null); // pentru reset
   const [loading, setLoading] = useState(true);
@@ -14,7 +16,7 @@ export default function DoctorProfilePage() {
       setLoading(true);
       setError('');
       try {
-        const userId = localStorage.getItem('userId');
+        const userId = user?.userId;
         const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
         const res = await fetch(`${BACKEND_URL}/api/doctor/profile?userId=${userId}`);
         if (!res.ok) throw new Error('Eroare la încărcarea profilului');
@@ -27,8 +29,8 @@ export default function DoctorProfilePage() {
         setLoading(false);
       }
     }
-    fetchDoctor();
-  }, []);
+    if (user?.userId) fetchDoctor();
+  }, [user]);
 
   const handleChange = (e) => {
     setDoctor({ ...doctor, [e.target.name]: e.target.value });

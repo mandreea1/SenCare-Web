@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import logo from '../../assets/logo1.png';
+import { useAuth } from '../../context/AuthContext';
 
-export default function PacientDashboard({ onLogout, user }) {
+export default function PacientDashboard({ onLogout }) {
+          const { user } = useAuth();
   const [pacient, setPacient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,7 +18,7 @@ export default function PacientDashboard({ onLogout, user }) {
       setLoading(true);
       setError('');
       try {
-        const userId = user?.userId || localStorage.getItem('userId');
+        const userId = user?.userId;
         if (!userId) {
           setPacient(null);
           setLoading(false);
@@ -40,7 +42,7 @@ export default function PacientDashboard({ onLogout, user }) {
         setLoading(false);
       }
     }
-    fetchPacientData();
+    if (user?.userId)fetchPacientData();
   }, [user]);
 
   const renderErrorMessage = () => {

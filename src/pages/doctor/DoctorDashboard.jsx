@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FaUserMd, FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/logo1.png';
 
-export default function DoctorDashboard({ onLogout, user }) {
+export default function DoctorDashboard({ onLogout}) {
+        const { user } = useAuth();
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,7 +18,7 @@ export default function DoctorDashboard({ onLogout, user }) {
       setLoading(true);
       setError('');
       try {
-        const userId = user?.userId || localStorage.getItem('userId');
+        const userId = user?.userId;
         if (!userId) {
           setDoctor(null);
           setLoading(false);
@@ -40,7 +42,7 @@ export default function DoctorDashboard({ onLogout, user }) {
         setLoading(false);
       }
     }
-    fetchDoctorData();
+    if (user?.userId) fetchDoctorData();
   }, [user]);
 
   const renderErrorMessage = () => {
