@@ -604,3 +604,24 @@ input, textarea {
     padding: 6px 2px;
   }
 }
+
+.valori-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  margin-bottom: 16px;
+}
+.valori-form-grid label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-blue-outline {
+  border: 2px solid #1976d2 !important;
+  color: #1976d2 !important;
+  background: #fff !important;
+  margin-left: 8px;
+}
+.btn-blue-outline:hover {
+  background: #e3f0fd !important;
+}

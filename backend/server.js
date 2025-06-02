@@ -460,6 +460,23 @@ app.put('/api/doctor/profile', async (req, res) => {
   }
 });
 
+app.post('/api/doctor/pacient/:id/istoric', async (req, res) => {
+  const { id } = req.params;
+  const { istoricpacient } = req.body;
+  
+  try {
+    await new sql.Request()
+      .input('PacientID', sql.Int, id)
+      .input('IstoricPacient', sql.NVarChar(sql.MAX), istoricpacient)
+      .query(`INSERT INTO istoric (istoricpacient, pacientid) VALUES (@IstoricPacient, @PacientID)`);
+    
+    res.status(201).json({ message: 'Istoric adăugat cu succes' });
+  } catch (err) {
+    console.error('Eroare la adăugare istoric:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/doctor/pacient/:id/istoric', async (req, res) => {
   const { id } = req.params;
   try {

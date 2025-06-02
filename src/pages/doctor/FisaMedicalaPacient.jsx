@@ -75,7 +75,16 @@ useEffect(() => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/valorinormale`);
       setValoriNormale(res.data);
-      setFormValori(res.data || formValori);
+      setFormValori({
+        ValoarePulsMin: res.data.ValoarePulsMin ?? '',
+        ValoarePulsMax: res.data.ValoarePulsMax ?? '',
+        ValoareTemperaturaMin: res.data.ValoareTemperaturaMin ?? '',
+        ValoareTemperaturaMax: res.data.ValoareTemperaturaMax ?? '',
+        ValoareECGMin: res.data.ValoareECGMin ?? '',
+        ValoareECGMax: res.data.ValoareECGMax ?? '',
+        ValoareUmiditateMin: res.data.ValoareUmiditateMin ?? '',
+        ValoareUmiditateMax: res.data.ValoareUmiditateMax ?? ''
+      });
     } catch (err) {
       setValoriNormale(null);
     }
@@ -93,14 +102,35 @@ useEffect(() => {
 
 const handleSaveValori = async () => {
   try {
+    // Salvează valorile normale
     await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/valorinormale`, formValori);
+    
+    // Crează textul pentru istoric
+    const dataActuala = new Date().toLocaleString('ro-RO');
+    const istoricText = `[${dataActuala}] Modificare valori normale: Puls: ${formValori.ValoarePulsMin}-${formValori.ValoarePulsMax} bpm, ` +
+      `Temperatură: ${formValori.ValoareTemperaturaMin}-${formValori.ValoareTemperaturaMax}°C, ` +
+      `ECG: ${formValori.ValoareECGMin}-${formValori.ValoareECGMax}, ` +
+      `Umiditate: ${formValori.ValoareUmiditateMin}-${formValori.ValoareUmiditateMax}%`;
+
+    // Salvează în istoric
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/istoric`, {
+      istoricpacient: istoricText
+    });
+
+    // Actualizează starea
     setValoriNormale(formValori);
     setEditValori(false);
+    
+    // Reîncarcă istoricul
+    const resIstoric = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/istoric`);
+    setIstoric(resIstoric.data);
+
+    alert('Valorile au fost salvate cu succes!');
   } catch (err) {
-    alert('Eroare la salvare valori normale!');
+    console.error('Eroare:', err);
+    alert('Eroare la salvare valori normale! ' + (err.response?.data?.message || err.message));
   }
 };
-
   return (
     <div className="fisa-medicala-container">
       <div className="fisa-medicala-card">
@@ -148,16 +178,18 @@ const handleSaveValori = async () => {
             )}
             {editValori && (
                 <div>
-                <label>Puls min: <input type="number" name="ValoarePulsMin" value={formValori.ValoarePulsMin} onChange={handleChangeValori} /></label>
-                <label>Puls max: <input type="number" name="ValoarePulsMax" value={formValori.ValoarePulsMax} onChange={handleChangeValori} /></label>
-                <label>Temperatură min: <input type="number" name="ValoareTemperaturaMin" value={formValori.ValoareTemperaturaMin} onChange={handleChangeValori} /></label>
-                <label>Temperatură max: <input type="number" name="ValoareTemperaturaMax" value={formValori.ValoareTemperaturaMax} onChange={handleChangeValori} /></label>
-                <label>ECG min: <input type="number" name="ValoareECGMin" value={formValori.ValoareECGMin} onChange={handleChangeValori} /></label>
-                <label>ECG max: <input type="number" name="ValoareECGMax" value={formValori.ValoareECGMax} onChange={handleChangeValori} /></label>
-                <label>Umiditate min: <input type="number" name="ValoareUmiditateMin" value={formValori.ValoareUmiditateMin} onChange={handleChangeValori} /></label>
-                <label>Umiditate max: <input type="number" name="ValoareUmiditateMax" value={formValori.ValoareUmiditateMax} onChange={handleChangeValori} /></label>
-                <button className="btn-primary" onClick={handleSaveValori}>Salvează</button>
-                <button className="btn-secondary" onClick={() => setEditValori(false)}>Anulează</button>
+                    <div className="valori-form-grid">
+                        <label>Puls min: <input type="number" name="ValoarePulsMin" value={formValori.ValoarePulsMin} onChange={handleChangeValori} /></label>
+                        <label>Puls max: <input type="number" name="ValoarePulsMax" value={formValori.ValoarePulsMax} onChange={handleChangeValori} /></label>
+                        <label>Temperatură min: <input type="number" name="ValoareTemperaturaMin" value={formValori.ValoareTemperaturaMin} onChange={handleChangeValori} /></label>
+                        <label>Temperatură max: <input type="number" name="ValoareTemperaturaMax" value={formValori.ValoareTemperaturaMax} onChange={handleChangeValori} /></label>
+                        <label>ECG min: <input type="number" name="ValoareECGMin" value={formValori.ValoareECGMin} onChange={handleChangeValori} /></label>
+                        <label>ECG max: <input type="number" name="ValoareECGMax" value={formValori.ValoareECGMax} onChange={handleChangeValori} /></label>
+                        <label>Umiditate min: <input type="number" name="ValoareUmiditateMin" value={formValori.ValoareUmiditateMin} onChange={handleChangeValori} /></label>
+                        <label>Umiditate max: <input type="number" name="ValoareUmiditateMax" value={formValori.ValoareUmiditateMax} onChange={handleChangeValori} /></label>
+                    </div>
+                    <button className="btn-primary" onClick={handleSaveValori}>Salvează</button>
+                    <button className="btn-secondary btn-blue-outline" onClick={() => setEditValori(false)}>Anulează</button>
                 </div>
             )}
             {!valoriNormale && !editValori && (
