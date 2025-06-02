@@ -23,6 +23,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/patient" element={<PatientDashboard />} />
         <Route path="/patient/profile" element={<PatientView />} />
         <Route path="/patient/history" element={<PatientHistory />} />

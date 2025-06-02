@@ -890,3 +890,67 @@ input, textarea {
 .btn-add-recomandare:hover {
   background: #e0e0e0;
 }
+
+.forgot-password-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+.forgot-password-form {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.forgot-password-form h2 {
+  color: #2D68F8;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.forgot-password-form p {
+  color: #666;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.forgot-password-form .message {
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.forgot-password-form .message.success {
+  background-color: #e6ffe6;
+  color: #006600;
+}
+
+.forgot-password-form .message.error {
+  background-color: #ffe6e6;
+  color: #cc0000;
+}
+
+.forgot-password-form button {
+  width: 100%;
+  padding: 12px;
+  background: #2D68F8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.forgot-password-form button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

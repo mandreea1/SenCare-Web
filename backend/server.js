@@ -754,6 +754,97 @@ app.delete('/api/doctor/pacient/:id/recomandari/:recomandareId', async (req, res
     }
 });
 
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
+// Configurare transport email
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+const resetTokens = new Map(); // Stochează temporar token-urile de resetare
+
+// Endpoint pentru cererea de resetare parolă
+app.post('/api/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Verifică dacă există utilizatorul
+    const user = await new sql.Request()
+      .input('email', sql.NVarChar, email)
+      .query('SELECT * FROM Users WHERE Email = @email');
+
+    if (user.recordset.length === 0) {
+      return res.status(404).json({ error: 'Nu există cont cu acest email.' });
+    }
+
+    // Generează token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    
+    // Salvează token-ul în Map cu expirare după 1 oră
+    resetTokens.set(resetToken, {
+      email: email,
+      expiry: Date.now() + 3600000 // 1 oră
+    });
+
+    // Trimite email
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Resetare parolă SenCare',
+      html: `
+        <h1>Resetare parolă</h1>
+        <p>Ați solicitat resetarea parolei pentru contul dumneavoastră SenCare.</p>
+        <p>Click pe link-ul următor pentru a vă reseta parola:</p>
+        <a href="${resetUrl}">${resetUrl}</a>
+        <p>Link-ul este valid timp de o oră.</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: 'Email-ul de resetare a fost trimis cu succes.' });
+  } catch (err) {
+    console.error('Eroare:', err);
+    res.status(500).json({ error: 'Eroare la procesarea cererii.' });
+  }
+});
+
+// Endpoint pentru resetarea efectivă a parolei
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    // Verifică token-ul
+    const tokenData = resetTokens.get(token);
+    if (!tokenData || Date.now() > tokenData.expiry) {
+      return res.status(400).json({ error: 'Token invalid sau expirat' });
+    }
+
+    // Hash pentru noua parolă
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Actualizează parola
+    await new sql.Request()
+      .input('email', sql.NVarChar, tokenData.email)
+      .input('password', sql.NVarChar, hashedPassword)
+      .query('UPDATE Users SET Password = @password WHERE Email = @email');
+
+    // Șterge token-ul folosit
+    resetTokens.delete(token);
+
+    res.json({ message: 'Parola a fost resetată cu succes' });
+  } catch (err) {
+    console.error('Eroare:', err);
+    res.status(500).json({ error: 'Eroare la resetarea parolei' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });
