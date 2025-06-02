@@ -273,11 +273,17 @@ const handleDeleteAlarm = async (alarmaId) => {
 const handleSavePdfWithHistory = async () => {
   try {
     const element = document.querySelector('.fisa-medicala-card');
-    const opt = { margin: 0.5, filename: 'fisa-medicala.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+    const opt = {
+      margin: 0.5,
+      filename: 'fisa-medicala.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
 
-    // Creează PDF și obține blob-ul corect
+    // Generează PDF și obține blob
     const worker = html2pdf().from(element).set(opt);
-    const pdfBlob = await worker.outputPdf('blob'); // sau: await worker.output('blob');
+    const pdfBlob = await worker.outputPdf('blob');
 
     const formData = new FormData();
     formData.append('pdf', pdfBlob, 'fisa-medicala.pdf');
@@ -302,38 +308,6 @@ const handleSavePdfWithHistory = async () => {
   }
 };
 
-const handleSavePdf = async () => {
-  try {
-    // Pregătim descrierea PDF-ului
-    const currentDate = new Date().toLocaleDateString('ro-RO');
-    const descriere = `Consultație din ${currentDate}`;
-
-    // Trimitem doar datele către backend
-    await axios.post(
-      `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`,
-      {
-        pacient,
-        istoric,
-        valoriNormale,
-        alarme: alarmeAvertizari,
-        recomandari,
-        descriere,
-        date: new Date().toISOString()
-      }
-    );
-
-    // Actualizăm istoricul fișelor medicale
-    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/medical-records-pdf`);
-    setMedicalRecordHistory(res.data);
-
-    // Afișăm mesajul de succes
-    setPdfSaved(true);
-    setTimeout(() => setPdfSaved(false), 3000);
-  } catch (err) {
-    console.error('Eroare la generarea și salvarea PDF-ului:', err);
-    alert('Eroare la salvarea fișei medicale ca PDF: ' + (err.message || 'A apărut o eroare necunoscută'));
-  }
-};
 
   // Funcția pentru vizualizarea unui PDF din istoric
 const handleViewPdf = async (recordId) => {
@@ -699,33 +673,31 @@ const handleDeletePdf = async (recordId) => {
   </div>
   
   <div className="istoric-fise-list">
-    {Array.isArray(medicalRecordHistory) && medicalRecordHistory.length > 0 ? (
-      medicalRecordHistory.map((record) => (
-        <div key={record.id} className="fisa-istoric-item">
-          <div className="fisa-istoric-info">
-            <div className="fisa-istoric-data">{record.date}</div>
-            <div className="fisa-istoric-detalii">
-              Fișa medicală - {record.descriere}
-            </div>
-          </div>
-          
-          <div className="fisa-istoric-actions">
-            <button className="btn-view-pdf" onClick={() => handleViewPdf(record.id)}>
-              <i className="fas fa-eye"></i> Vizualizează
-            </button>
-            <button className="btn-delete-pdf" onClick={() => handleDeletePdf(record.id)}>
-              <i className="fas fa-trash"></i> Șterge
-            </button>
+  {Array.isArray(medicalRecordHistory) && medicalRecordHistory.length > 0 ? (
+    medicalRecordHistory.map((record) => (
+      <div key={record.id} className="fisa-istoric-item">
+        <div className="fisa-istoric-info">
+          <div className="fisa-istoric-data">{record.date}</div>
+          <div className="fisa-istoric-detalii">
+            Fișa medicală - {record.descriere}
           </div>
         </div>
-      ))
-    ) : (
-      <p className="no-records-message">
-        <i className="fas fa-info-circle"></i> Nu există fișe medicale salvate în istoric. 
-        Puteți crea o nouă fișă apăsând butonul "Salvează Fișă ca PDF" de mai sus.
-      </p>
-    )}
-  </div>
+        <div className="fisa-istoric-actions">
+          <button className="btn-view-pdf" onClick={() => handleViewPdf(record.id)}>
+            <i className="fas fa-eye"></i> Vizualizează
+          </button>
+          <button className="btn-delete-pdf" onClick={() => handleDeletePdf(record.id)}>
+            <i className="fas fa-trash"></i> Șterge
+          </button>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="no-records-message">
+      <i className="fas fa-info-circle"></i> Nu există fișe medicale salvate în istoric.
+    </p>
+  )}
+</div>
   
   <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => navigate(-1)}>
     Înapoi la pacienți
