@@ -505,7 +505,7 @@ app.get('/doctor/pacient/:id/valorinormale', async (req, res) => {
   try {
     const { id } = req.params;
     const [rows] = await db.query('SELECT * FROM valorinormalepacient WHERE PacientId = ?', [id]);
-    if (rows.length === 0) return res.status(404).json({});
+   if (rows.length === 0) return res.json({});
     res.json(rows[0]);
   } catch (err) {
     res.status(500).json({ error: 'Eroare la interogare valori normale.' });
