@@ -693,7 +693,7 @@ input, textarea {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background-color: rgba(255, 255, 255, 0.95); /* Fundal alb semi-transparent */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -701,11 +701,14 @@ input, textarea {
 }
 
 .modal-content {
-  background: white;
+  background-color: white;
   padding: 24px;
   border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  border: 1px solid #ddd;
 }
 
 .form-group {
