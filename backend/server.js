@@ -687,7 +687,7 @@ app.get('/api/doctor/pacient/:id/recomandari', async (req, res) => {
             .input('PacientID', sql.Int, req.params.id)
             .query(`
                 SELECT *
-                FROM Recomandari
+                FROM RecomandariMedicale
                 WHERE PacientID = @PacientID
                 ORDER BY DataRecomandare DESC
             `);
@@ -714,7 +714,7 @@ app.post('/api/doctor/pacient/:id/recomandari', async (req, res) => {
             .input('DurataZilnica', sql.NVarChar(50), DurataZilnica || '')
             .input('AlteIndicatii', sql.NVarChar(sql.MAX), AlteIndicatii || '')
             .query(`
-                INSERT INTO Recomandari (PacientID, TipRecomandare, DurataZilnica, AlteIndicatii)
+                INSERT INTO RecomandariMedicale (PacientID, TipRecomandare, DurataZilnica, AlteIndicatii)
                 VALUES (@PacientID, @TipRecomandare, @DurataZilnica, @AlteIndicatii);
                 
                 SELECT SCOPE_IDENTITY() AS RecomandareID;
@@ -737,7 +737,7 @@ app.delete('/api/doctor/pacient/:id/recomandari/:recomandareId', async (req, res
             .input('RecomandareID', sql.Int, req.params.recomandareId)
             .input('PacientID', sql.Int, req.params.id)
             .query(`
-                DELETE FROM Recomandari
+                DELETE FROM RecomandariMedicale
                 WHERE RecomandareID = @RecomandareID AND PacientID = @PacientID;
                 
                 SELECT @@ROWCOUNT AS deleted;
