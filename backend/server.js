@@ -925,26 +925,58 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
   }
 });
 
-// POST - Salvează o fișă medicală PDF pentru un pacient
-app.post('/api/doctor/pacient/:id/medical-records-pdf', upload.single('pdf'), async (req, res) => {
+const PDFDocument = require('pdfkit');
+
+app.post('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
   try {
-    console.log('Body primit:', req.body); // vezi ce primești
     const { id } = req.params;
-    const { Descriere, date } = req.body;
-    const filepath = req.file.path;
+    const { pacient, istoric, valoriNormale, alarme, recomandari, descriere, date } = req.body;
+
+    // Creează folder dacă nu există
+    const dir = path.join(__dirname, '../uploads/medical-records');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+    // Creează PDF
+    const fileName = `medical_record_${id}_${Date.now()}.pdf`;
+    const filePath = path.join(dir, fileName);
+    const doc = new PDFDocument();
+    doc.pipe(fs.createWriteStream(filePath));
+
+    doc.fontSize(18).text('Fișă Medicală', { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(12).text(`Nume: ${pacient?.Nume || '-'}`);
+    doc.text(`Prenume: ${pacient?.Prenume || '-'}`);
+    doc.text(`Descriere: ${descriere || '-'}`);
+    doc.text(`Data: ${date || '-'}`);
+    doc.moveDown();
+    doc.text('Istoric:');
+    doc.text(JSON.stringify(istoric, null, 2));
+    doc.moveDown();
+    doc.text('Valori normale:');
+    doc.text(JSON.stringify(valoriNormale, null, 2));
+    doc.moveDown();
+    doc.text('Alarme:');
+    doc.text(JSON.stringify(alarme, null, 2));
+    doc.moveDown();
+    doc.text('Recomandări:');
+    doc.text(JSON.stringify(recomandari, null, 2));
+    doc.end();
+
+    // Salvează calea PDF în DB
     await new sql.Request()
       .input('pacientId', sql.Int, id)
-      .input('FilePath', sql.NVarChar(500), filepath)
-      .input('Descriere', sql.NVarChar(500), Descriere)
+      .input('FilePath', sql.NVarChar(500), filePath)
+      .input('Descriere', sql.NVarChar(500), descriere)
       .input('date', sql.NVarChar(50), date)
       .query(`
         INSERT INTO FiseMedicalePacientPdf (pacientId, FilePath, Descriere, date, created_at) 
         VALUES (@pacientId, @FilePath, @Descriere, @date, GETDATE())
       `);
+
     res.status(201).json({ success: true, message: 'Fișă medicală salvată cu succes' });
   } catch (error) {
     console.error('Error saving medical record PDF:', error);
-    res.status(500).json({ error: 'Eroare la generarea PDF-ului', details: err.message });
+    res.status(500).json({ error: 'Eroare la generarea PDF-ului', details: error.message });
   }
 });
 
@@ -979,7 +1011,7 @@ app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, 
     if (!result.recordset.length) {
       return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
     }
-    const filepath = result.recordset[0].filepath;
+    const filepath = result.recordset[0].Filepath;
     if (fs.existsSync(filepath)) {
       fs.unlinkSync(filepath);
     }
