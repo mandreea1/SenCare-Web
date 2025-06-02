@@ -1192,9 +1192,13 @@ app.get('/api/pacient/ecg-ultim', async (req, res) => {
     const pacientId = pacient.recordset[0].PacientID;
     const result = await new sql.Request()
       .input('PacientID', sql.Int, pacientId)
-      .query('SELECT TOP 1 ECG FROM Masuratori WHERE PacientID = @PacientID ORDER BY DataMasurare DESC');
-    if (!result.recordset.length) return res.json({});
-    res.json(result.recordset[0]);
+      .query(`
+        SELECT TOP 1 ECG, Data_timp
+        FROM DateFiziologice
+        WHERE PacientID = @PacientID AND ECG IS NOT NULL AND ECG <> ''
+        ORDER BY Data_timp DESC
+      `);
+    res.json(result.recordset[0] || {});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -1203,14 +1207,19 @@ app.get('/api/pacient/ecg-ultim', async (req, res) => {
 app.get('/api/pacient/datefiziologice', async (req, res) => {
   const { userId } = req.query;
   try {
+    // Găsește PacientID după userId
     const pacient = await new sql.Request()
       .input('UserID', sql.Int, userId)
       .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
-    if (!pacient.recordset.length) return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    if (!pacient.recordset.length) {
+      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    }
     const pacientId = pacient.recordset[0].PacientID;
+
+    // Selectează datele fiziologice
     const result = await new sql.Request()
       .input('PacientID', sql.Int, pacientId)
-      .query('SELECT * FROM Masuratori WHERE PacientID = @PacientID ORDER BY DataMasurare DESC');
+      .query(`SELECT IdMasurare, Puls, Temperatura, Umiditate, Data_timp FROM DateFiziologice WHERE PacientID = @PacientID ORDER BY Data_timp ASC`);
     res.json(result.recordset);
   } catch (err) {
     res.status(500).json({ error: err.message });
