@@ -666,12 +666,11 @@ input, textarea {
 
 .alarma-tip {
   font-weight: bold;
-  font-size: 0.9em;
+  margin-bottom: 4px;
 }
 
 .alarma-descriere {
   font-size: 0.9em;
-  margin-top: 4px;
 }
 
 .btn-add-alarm {

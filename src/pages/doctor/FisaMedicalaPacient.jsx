@@ -120,13 +120,28 @@ const handleAddAlarm = (parameter) => {
 
 const handleSaveAlarm = async () => {
   try {
-    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/alarme`, newAlarm);
+    if (!newAlarm.TipAlarma || !newAlarm.Descriere) {
+      alert('Vă rugăm completați toate câmpurile!');
+      return;
+    }
+
+    const alarmToSave = {
+      ...newAlarm,
+      PacientID: id
+    };
+
+    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/alarme`, alarmToSave);
+    
+    // Reîncarcă alarmele
     const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/alarme`);
     setAlarmeAvertizari(res.data);
-    setShowAlarmModal(false);
+    
+    // Resetează formularul
     setNewAlarm({ TipAlarma: '', Descriere: '' });
+    setShowAlarmModal(false);
   } catch (err) {
-    alert('Eroare la salvarea alarmei!');
+    console.error('Eroare:', err);
+    alert('Eroare la salvarea alarmei: ' + (err.response?.data?.error || err.message));
   }
 };
 
@@ -282,8 +297,8 @@ const handleSaveValori = async () => {
           .filter(a => a.TipAlarma.includes('ECG'))
           .map((alarma, idx) => (
             <div key={idx} className={`alarma-item ${alarma.TipAlarma.includes('Avertizare') ? 'avertizare' : 'alarma'}`}>
-              <span className="alarma-tip">{alarma.TipAlarma}</span>
-              <span className="alarma-descriere">{alarma.Descriere}</span>
+                <span className="alarma-tip">{alarma.TipAlarma}</span>
+                <span className="alarma-descriere">{alarma.Descriere}</span>
             </div>
           ))}
       </div>
