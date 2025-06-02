@@ -12,33 +12,32 @@ function ResetPassword() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      setIsError(true);
-      setMessage('Parolele nu coincid');
-      return;
-    }
-
-    setIsLoading(true);
-    setMessage('');
+  e.preventDefault();
+  if (password !== confirmPassword) {
+    setMessage('Parolele nu coincid.');
+    setIsError(true);
+    return;
+  }
+  setIsLoading(true);
+  try {
+    await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/api/reset-password`,
+      {
+        token,      // tokenul din URL
+        password    // parola nouă
+      }
+    );
+    setMessage('Parola a fost resetată cu succes!');
     setIsError(false);
-
-    try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/reset-password`, {
-        token,
-        password
-      });
-      
-      setMessage('Parola a fost resetată cu succes!');
-      setTimeout(() => navigate('/login'), 3000);
-    } catch (err) {
-      setIsError(true);
-      setMessage(err.response?.data?.error || 'A apărut o eroare. Vă rugăm încercați din nou.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    // Poți naviga la login după câteva secunde, dacă vrei
+    // setTimeout(() => navigate('/login'), 2000);
+  } catch (err) {
+    setMessage('A apărut o eroare. Vă rugăm încercați din nou.');
+    setIsError(true);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="forgot-password-container">
