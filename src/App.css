@@ -1254,3 +1254,104 @@ input, textarea {
     justify-content: center;
   }
 }
+
+
+/* Responsive navbar și pagini */
+.pacient-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(120deg, #2D68F8 0%,#4682c2 );
+  color: #fff;
+  padding: 0 16px;
+  min-height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(60,60,120,0.07);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.pacient-navbar .logo {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pacient-navbar .logo a {
+  color: #fff;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pacient-navbar .logo a:hover {
+  opacity: 0.85;
+  color: #fff;
+}
+
+.pacient-navbar .logo a:active {
+  transform: scale(0.98);
+}
+
+.pacient-navbar .nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 24px;
+  flex-wrap: wrap;
+}
+
+.pacient-navbar .right-icons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pacient-navbar .icon-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  padding: 0;
+}
+
+@media (max-width: 700px) {
+  .pacient-navbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 4px;
+    min-height: unset;
+    width: 100%;
+  }
+  .pacient-navbar .logo {
+     display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  }
+  .pacient-navbar .nav-menu {
+    justify-content: center;
+    margin: 8px 0;
+    gap: 8px;
+    width: 100%;
+  }
+  .pacient-navbar .right-icons {
+    justify-content: center;
+    margin-bottom: 8px;
+    width: 100%;
+  }
+  .nav-link {
+    font-size: 16px;
+    padding: 8px 8px;
+  }
+}

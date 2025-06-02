@@ -3,9 +3,9 @@ import {Route, Routes, useNavigate } from 'react-router-dom';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Login from './pages/Login';
-import PatientDashboard from './pages/patient/PatientDashboard';
-import PatientView from './pages/patient/PatientView';
-import PatientHistory from './pages/patient/PatientHistory';
+import PatientDashboard from './pages/pacient/PacientDashboard';
+import PatientView from './pages/pacient/PatientView';
+import PatientHistory from './pages/pacient/PatientHistory';
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdaugaPacient from './pages/doctor/AdaugaPacient';
@@ -16,6 +16,7 @@ import DoctorProfilePage from './pages/doctor/DoctorProfilePage';
 import FisaMedicalaPacient from './pages/doctor/FisaMedicalaPacient';
 import GraficeEvolutie from './pages/doctor/GraficeEvolutie';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import PacientDashboard from './pages/pacient/PacientDashboard';
 import './App.css';
 
 // Creăm un component wrapper pentru a putea utiliza hook-uri
@@ -34,10 +35,6 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/patient" element={<PatientDashboard onLogout={handleLogout} />} />
-        <Route path="/patient/profile" element={<PatientView />} />
-        <Route path="/patient/history" element={<PatientHistory />} />
-        <Route path="/doctor" element={<DoctorDashboard onLogout={handleLogout} user={user} />}></Route>
         
         {/* Nested doctor routes */}
         <Route path="/doctor" element={<DoctorDashboard onLogout={handleLogout} user={user} />}>
@@ -50,6 +47,10 @@ function AppRoutes() {
           <Route path="/doctor/pacient/:id/grafice" element={<GraficeEvolutie />} />
         </Route>
 
+              {/* Rute pentru pacient (în limba română) */}
+        <Route path="/pacient" element={<PacientDashboard onLogout={handleLogout} user={user} />} />
+
+        {/* Rute pentru admin */}
         <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} />} />
       </Routes>
     </div>
