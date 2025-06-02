@@ -15,6 +15,7 @@ import GraficeEvolutie from './pages/doctor/GraficeEvolutie';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import PacientDashboard from './pages/pacient/PacientDashboard';
 import PacientProfilePage from './pages/pacient/PacientProfilePage';
+import PacientFisaMedicala from './pages/pacient/PacientFisaMedicala';
 import './App.css';
 
 // Creăm un component wrapper pentru a putea utiliza hook-uri
@@ -48,6 +49,7 @@ function AppRoutes() {
           {/* Nested pacient routes */}
           <Route path="/pacient" element={<PacientDashboard onLogout={handleLogout} user={user} />}>
             <Route path="profil" element={<PacientProfilePage user={user} />} />
+            <Route path="medical-records-pdf" element={<PacientFisaMedicala />} />
           </Route>
         {/* Rute pentru admin */}
         <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} />} />

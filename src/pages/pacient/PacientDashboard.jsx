@@ -55,22 +55,26 @@ export default function PacientDashboard({ onLogout }) {
   return (
     <div>
       {/* Bara de navigare sus */}
-      <nav className="doctor-navbar">
-        <div className="logo">
-          <FaUserCircle />
-          <Link to="/pacient">
-            SenCare
-          </Link>
-        </div>
-        <div className="right-icons">
-          <button className="icon-btn" title="Profil" onClick={() => navigate('/pacient/profil')}>
-            <FaUserCircle />
-          </button>
-          <button className="icon-btn" title="Logout" onClick={onLogout}>
-            <FaSignOutAlt />
-          </button>
-        </div>
-      </nav>
+<nav className="doctor-navbar">
+  <div className="logo">
+    <FaUserCircle />
+    <Link to="/pacient">
+      SenCare
+    </Link>
+  </div>
+  <div className="right-icons">
+    {/* Buton nou pentru fișe medicale */}
+    <Link to="/pacient/medical-records-pdf" className="icon-btn" title="Fișe medicale">
+      Fișe medicale
+    </Link>
+    <button className="icon-btn" title="Profil" onClick={() => navigate('/pacient/profil')}>
+      <FaUserCircle />
+    </button>
+    <button className="icon-btn" title="Logout" onClick={onLogout}>
+      <FaSignOutAlt />
+    </button>
+  </div>
+</nav>
 
       {/* Main Content */}
       <main className="main-content">
