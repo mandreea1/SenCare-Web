@@ -8,21 +8,16 @@ function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setMessage('');
+  e.preventDefault();
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/forgot-password`, { email });
     setIsError(false);
-
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/forgot-password`, { email });
-      setMessage('Un email cu instrucțiuni de resetare a parolei a fost trimis.');
-    } catch (err) {
-      setIsError(true);
-      setMessage(err.response?.data?.error || 'A apărut o eroare. Vă rugăm încercați din nou.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setMessage(response.data.message || 'Email-ul a fost trimis cu succes!');
+  } catch (err) {
+    setIsError(true);
+    setMessage(err.response?.data?.error || 'A apărut o eroare. Vă rugăm încercați din nou.');
+  }
+};
 
   return (
     <div className="forgot-password-container">
