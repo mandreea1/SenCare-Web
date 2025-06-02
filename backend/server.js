@@ -914,7 +914,7 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf', async (req, res) => {
       .input('pacientId', sql.Int, id)
       .query(`
         SELECT pdfId as id, FilePath, Descriere, date, created_at 
-        FROM FiseMedicalePacientPdf_pdf 
+        FROM FiseMedicalePacientPdf 
         WHERE pacientId = @pacientId 
         ORDER BY created_at DESC
       `);
@@ -937,7 +937,7 @@ app.post('/api/doctor/pacient/:id/medical-records-pdf', upload.single('pdf'), as
       .input('Descriere', sql.NVarChar(500), Descriere)
       .input('date', sql.NVarChar(50), date)
       .query(`
-        INSERT INTO FiseMedicalePacientPdf_pdf (pacientId, FilePath, Descriere, date, created_at) 
+        INSERT INTO FiseMedicalePacientPdf (pacientId, FilePath, Descriere, date, created_at) 
         VALUES (@pacientId, @FilePath, @Descriere, @date, GETDATE())
       `);
     res.status(201).json({ success: true, message: 'Fișă medicală salvată cu succes' });
@@ -953,7 +953,7 @@ app.get('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, res
     const { recordId } = req.params;
     const result = await new sql.Request()
       .input('pdfId', sql.Int, recordId)
-      .query('SELECT FilePath FROM FiseMedicalePacientPdf_pdf WHERE pdfId = @pdfId');
+      .query('SELECT FilePath FROM FiseMedicalePacientPdf WHERE pdfId = @pdfId');
     if (!result.recordset.length) {
       return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
     }
@@ -974,7 +974,7 @@ app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, 
     const { recordId } = req.params;
     const result = await new sql.Request()
       .input('pdfId', sql.Int, recordId)
-      .query('SELECT FilePath FROM FiseMedicalePacientPdf_pdf WHERE pdfId = @pdfId');
+      .query('SELECT FilePath FROM FiseMedicalePacientPdf WHERE pdfId = @pdfId');
     if (!result.recordset.length) {
       return res.status(404).json({ error: 'Fișa medicală nu a fost găsită' });
     }
@@ -984,7 +984,7 @@ app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, 
     }
     await new sql.Request()
       .input('pdfId', sql.Int, recordId)
-      .query('DELETE FROM FiseMedicalePacientPdf_pdf WHERE pdfId = @pdfId');
+      .query('DELETE FROM FiseMedicalePacientPdf WHERE pdfId = @pdfId');
     res.json({ success: true, message: 'Fișa medicală a fost ștearsă cu succes' });
   } catch (error) {
     console.error('Error deleting medical record PDF:', error);
