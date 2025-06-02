@@ -44,9 +44,6 @@ transporter.verify()
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const bcrypt = require('bcryptjs');
-
-const cors = require('cors');
 
 const corsOptions = {
   origin: [

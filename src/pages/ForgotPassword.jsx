@@ -11,7 +11,11 @@ function ForgotPassword() {
   e.preventDefault();
   setIsLoading(true);
   try {
-    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/forgot-password`, { email });
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/api/forgot-password`, 
+      { email },
+      { withCredentials: true } // Adaugă această linie
+    );
     setIsError(false);
     setMessage(response.data.message || 'Email-ul a fost trimis cu succes!');
   } catch (err) {
