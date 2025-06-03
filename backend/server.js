@@ -550,45 +550,6 @@ app.get('/api/doctor/pacient/:id/datefiziologice', async (req, res) => {
   }
 });
 
-app.post('/api/mobile/datefiziologice', async (req, res) => {
-  const { userId, Puls, Temperatura, Umiditate, ECG, Data_timp } = req.body;
-
-  if (!Puls && !Temperatura && !Umiditate && !ECG) {
-    return res.status(400).json({ error: 'Trebuie să trimiți cel puțin o valoare fiziologică.' });
-  }
-
-  try {
-    // Găsește PacientID după userId
-    const pacient = await new sql.Request()
-      .input('UserID', sql.Int, userId)
-      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
-    
-    if (pacient.recordset.length === 0) {
-      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
-    }
-    
-    const pacientId = pacient.recordset[0].PacientID;
-
-    // Inserează datele fiziologice
-    await new sql.Request()
-      .input('PacientID', sql.Int, pacientId)
-      .input('Puls', sql.Int, Puls ?? null)
-      .input('Temperatura', sql.Float, Temperatura ?? null)
-      .input('Umiditate', sql.Float, Umiditate ?? null)
-      .input('ECG', sql.NVarChar(sql.MAX), ECG ?? null)
-      .input('Data_timp', sql.DateTime, Data_timp ? new Date(Data_timp) : new Date())
-      .query(`
-        INSERT INTO DateFiziologice (PacientID, Puls, Temperatura, Umiditate, ECG, Data_timp)
-        VALUES (@PacientID, @Puls, @Temperatura, @Umiditate, @ECG, @Data_timp)
-      `);
-
-    res.status(201).json({ message: 'Date fiziologice adăugate cu succes.' });
-  } catch (err) {
-    console.error('Eroare la adăugare date fiziologice:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 app.get('/api/doctor/pacient/:id/ecg-ultim', async (req, res) => {
   const { id } = req.params;
   try {
@@ -1264,6 +1225,174 @@ app.get('/api/pacient/istoric-alarme', async (req, res) => {
   }
 });
 
+app.post('/api/mobile/datefiziologice', async (req, res) => {
+  const { userId, Puls, Temperatura, Umiditate, ECG, Data_timp } = req.body;
+
+  if (!Puls && !Temperatura && !Umiditate && !ECG) {
+    return res.status(400).json({ error: 'Trebuie să trimiți cel puțin o valoare fiziologică.' });
+  }
+
+  try {
+    // Găsește PacientID după userId
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    
+    if (pacient.recordset.length === 0) {
+      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    }
+    
+    const pacientId = pacient.recordset[0].PacientID;
+
+    // Inserează datele fiziologice
+    await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .input('Puls', sql.Int, Puls ?? null)
+      .input('Temperatura', sql.Float, Temperatura ?? null)
+      .input('Umiditate', sql.Float, Umiditate ?? null)
+      .input('ECG', sql.NVarChar(sql.MAX), ECG ?? null)
+      .input('Data_timp', sql.DateTime, Data_timp ? new Date(Data_timp) : new Date())
+      .query(`
+        INSERT INTO DateFiziologice (PacientID, Puls, Temperatura, Umiditate, ECG, Data_timp)
+        VALUES (@PacientID, @Puls, @Temperatura, @Umiditate, @ECG, @Data_timp)
+      `);
+
+    res.status(201).json({ message: 'Date fiziologice adăugate cu succes.' });
+  } catch (err) {
+    console.error('Eroare la adăugare date fiziologice:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET - Obține valorile normale pentru un pacient (versiune mobilă)
+app.get('/api/mobile/valorinormale', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    // Găsește PacientID după userId
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    
+    if (pacient.recordset.length === 0) {
+      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    }
+    
+    const pacientId = pacient.recordset[0].PacientID;
+
+    // Obține valorile normale
+    const result = await new sql.Request()
+      .input('PacientId', sql.Int, pacientId)
+      .query('SELECT * FROM valorinormalepacient WHERE PacientId = @PacientId');
+    
+    if (!result.recordset.length) return res.json({});
+    res.json(result.recordset[0]);
+  } catch (err) {
+    console.error('Eroare SQL valorinormale:', err);
+    res.status(500).json({ error: 'Eroare la interogare valori normale.' });
+  }
+});
+
+// GET - Obține alarmele pentru un pacient (versiune mobilă)
+app.get('/api/mobile/alarme', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    // Găsește PacientID după userId
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    
+    if (pacient.recordset.length === 0) {
+      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    }
+    
+    const pacientId = pacient.recordset[0].PacientID;
+
+    // Obține alarmele
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .query(`
+        SELECT AlarmaID, PacientID, TipAlarma, Descriere
+        FROM AlarmeAvertizari 
+        WHERE PacientID = @PacientID
+      `);
+    
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare la obținerea alarmelor:', err);
+    res.status(500).json({ error: 'Eroare la obținerea alarmelor' });
+  }
+});
+
+// GET - Obține recomandările pentru un pacient (versiune mobilă)
+app.get('/api/mobile/recomandari', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    // Găsește PacientID după userId
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    
+    if (pacient.recordset.length === 0) {
+      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    }
+    
+    const pacientId = pacient.recordset[0].PacientID;
+
+    // Obține recomandările
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .query(`
+        SELECT *
+        FROM RecomandariMedicale
+        WHERE PacientID = @PacientID
+        ORDER BY DataRecomandare DESC
+      `);
+    
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Eroare la obținerea recomandărilor:', err);
+    res.status(500).json({ error: 'Eroare la obținerea recomandărilor: ' + err.message });
+  }
+});
+// POST - Adaugă o intrare în istoricul de alarme (pentru aplicația mobilă)
+app.post('/api/mobile/istoric-alarme', async (req, res) => {
+  try {
+    const { userId, alarmaId, tipAlarma, descriere, actiune } = req.body;
+    
+    // Validare
+    if (!userId || !tipAlarma || !actiune) {
+      return res.status(400).json({ error: 'UserId, TipAlarma și Actiune sunt obligatorii' });
+    }
+    
+    // Găsește PacientID după userId
+    const pacientResult = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    
+    if (pacientResult.recordset.length === 0) {
+      return res.status(404).json({ error: 'Pacientul nu a fost găsit' });
+    }
+    
+    const pacientId = pacientResult.recordset[0].PacientID;
+    
+    // Inserează în istoric
+    await new sql.Request()
+      .input('AlarmaID', sql.Int, alarmaId || null)
+      .input('PacientID', sql.Int, pacientId)
+      .input('TipAlarma', sql.NVarChar(50), tipAlarma)
+      .input('Descriere', sql.NVarChar(sql.MAX), descriere || '')
+      .input('Actiune', sql.NVarChar(50), actiune)
+      .query(`
+        INSERT INTO IstoricAlarmeAvertizari (AlarmaID, PacientID, TipAlarma, Descriere, Actiune)
+        VALUES (@AlarmaID, @PacientID, @TipAlarma, @Descriere, @Actiune)
+      `);
+      
+    res.status(201).json({ success: true, message: 'Istoric alarmă adăugat cu succes' });
+  } catch (err) {
+    console.error('Eroare la adăugarea în istoric alarme:', err);
+    res.status(500).json({ error: 'Eroare la adăugarea în istoric alarme', details: err.message });
+  }
+});
 
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
