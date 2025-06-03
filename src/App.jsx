@@ -56,7 +56,7 @@ function AppRoutes() {
           </Route>
 
         {/* Nested admin routes*/}
-        <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} user={user} />}>
+        <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} user={user}/>}>
          <Route path="add-doctor" element={<AdaugaMedic />} />
        </Route>
       </Routes>

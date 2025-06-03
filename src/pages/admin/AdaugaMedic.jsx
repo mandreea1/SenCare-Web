@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 function AdaugaMedic() {
+  const { user } = useAuth();
+
   const [form, setForm] = useState({
     nume: '',
     prenume: '',
@@ -23,7 +26,21 @@ function AdaugaMedic() {
     setMesaj('');
     try {
       const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
-      await axios.post(`${BACKEND_URL}/api/admin/add-doctor`, form);
+
+      // Folosește numele corecte de câmpuri care să corespundă cu cele din backend
+      await axios.post(
+        `${BACKEND_URL}/api/admin/add-doctor`,
+        {
+          nume: form.nume,
+          prenume: form.prenume,
+          Email: form.email,        // Cu E mare să corespundă cu backend-ul
+          telefon: form.telefon,
+          specializare: form.specializare,
+          password: form.parola,    // "password" în loc de "parola"
+          adminEmail: user.email    // Emailul adminului
+        },
+        { withCredentials: true }
+      );
       setMesaj('✅ Medicul a fost adăugat cu succes!');
       setForm({
         nume: '',
@@ -34,6 +51,7 @@ function AdaugaMedic() {
         parola: '',
       });
     } catch (err) {
+      console.error('Eroare:', err.response?.data || err.message);
       setMesaj('❌ Eroare la adăugare medic!');
     } finally {
       setLoading(false);
