@@ -550,17 +550,28 @@ app.get('/api/doctor/pacient/:id/datefiziologice', async (req, res) => {
   }
 });
 
-app.post('/api/doctor/pacient/:id/datefiziologice', async (req, res) => {
-  const { id } = req.params;
-  const { Puls, Temperatura, Umiditate, ECG, Data_timp } = req.body;
+app.post('/api/mobile/datefiziologice', async (req, res) => {
+  const { userId, Puls, Temperatura, Umiditate, ECG, Data_timp } = req.body;
 
   if (!Puls && !Temperatura && !Umiditate && !ECG) {
     return res.status(400).json({ error: 'Trebuie să trimiți cel puțin o valoare fiziologică.' });
   }
 
   try {
+    // Găsește PacientID după userId
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    
+    if (pacient.recordset.length === 0) {
+      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+    }
+    
+    const pacientId = pacient.recordset[0].PacientID;
+
+    // Inserează datele fiziologice
     await new sql.Request()
-      .input('PacientID', sql.Int, id)
+      .input('PacientID', sql.Int, pacientId)
       .input('Puls', sql.Int, Puls ?? null)
       .input('Temperatura', sql.Float, Temperatura ?? null)
       .input('Umiditate', sql.Float, Umiditate ?? null)
@@ -573,6 +584,7 @@ app.post('/api/doctor/pacient/:id/datefiziologice', async (req, res) => {
 
     res.status(201).json({ message: 'Date fiziologice adăugate cu succes.' });
   } catch (err) {
+    console.error('Eroare la adăugare date fiziologice:', err);
     res.status(500).json({ error: err.message });
   }
 });
