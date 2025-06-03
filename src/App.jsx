@@ -17,6 +17,7 @@ import PacientDashboard from './pages/pacient/PacientDashboard';
 import PacientProfilePage from './pages/pacient/PacientProfilePage';
 import PacientFisaMedicala from './pages/pacient/PacientFisaMedicala';
 import GraficeEvolutie1 from './pages/pacient/GraficeEvolutie1';
+import AdaugaMedic from './pages/admin/AdaugaMedic';
 import './App.css';
 
 // Creăm un component wrapper pentru a putea utiliza hook-uri
@@ -53,8 +54,11 @@ function AppRoutes() {
             <Route path="medical-records-pdf" element={<PacientFisaMedicala />} />
             <Route path="/pacient/grafice" element={<GraficeEvolutie1 userId={user?.userId} />} />
           </Route>
-        {/* Rute pentru admin */}
-        <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} />} />
+
+        {/* Nested admin routes*/}
+        <Route path="/admin" element={<AdminDashboard onLogout={handleLogout} user={user} />}>
+         <Route path="add-doctor" element={<AdaugaMedic />} />
+       </Route>
       </Routes>
     </div>
   );

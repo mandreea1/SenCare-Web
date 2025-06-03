@@ -295,8 +295,8 @@ const downloadAndShowPdf = async (pdfId) => {
             </p>
           )}
         </div>
-
-<div className="istoric-alarme-container">
+      </div>
+      <div className="istoric-alarme-container">
   <h3 className="istoric-fise-title">Istoric alarme și avertizări</h3>
   <div className="istoric-fise-list">
     {istoricAlarme.length > 0 ? (
@@ -320,7 +320,6 @@ const downloadAndShowPdf = async (pdfId) => {
     )}
   </div>
 </div>
-      </div>
     </div>
   );
 }
