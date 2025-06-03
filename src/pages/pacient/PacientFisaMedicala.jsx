@@ -15,6 +15,19 @@ function PacientFisaMedicala() {
   const [alarmeAvertizari, setAlarmeAvertizari] = useState([]);
   const [recomandari, setRecomandari] = useState([]);
   const [medicalRecordHistory, setMedicalRecordHistory] = useState([]);
+  const [istoricAlarme, setIstoricAlarme] = useState([]);
+
+  useEffect(() => {
+  async function fetchIstoricAlarme() {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/pacient/istoric-alarme?userId=${user?.userId}`);
+      setIstoricAlarme(res.data);
+    } catch (err) {
+      setIstoricAlarme([]);
+    }
+  }
+  if (user?.userId) fetchIstoricAlarme();
+}, [user]);
 
 useEffect(() => {
   async function fetchPacient() {
@@ -282,6 +295,31 @@ const downloadAndShowPdf = async (pdfId) => {
             </p>
           )}
         </div>
+
+<div className="istoric-alarme-container">
+  <h3 className="istoric-fise-title">Istoric alarme și avertizări</h3>
+  <div className="istoric-fise-list">
+    {istoricAlarme.length > 0 ? (
+      istoricAlarme.map((item, idx) => (
+        <div key={idx} className="fisa-istoric-item">
+          <div className="fisa-istoric-info">
+            <div className="fisa-istoric-data">{new Date(item.DataCreare).toLocaleString('ro-RO')}</div>
+            <div className="fisa-istoric-detalii">
+              <b>{item.TipAlarma}</b> — {item.Descriere}
+            </div>
+          </div>
+          <div className="fisa-istoric-actions">
+            <span className="alarma-actiune">{item.Actiune}</span>
+          </div>
+        </div>
+      ))
+    ) : (
+      <p className="no-records-message">
+        <i className="fas fa-info-circle"></i> Nu există alarme sau avertizări în istoric.
+      </p>
+    )}
+  </div>
+</div>
       </div>
     </div>
   );

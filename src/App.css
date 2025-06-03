@@ -1380,3 +1380,106 @@ input, textarea {
   gap: 12px;
   font-size: 1.1rem;
 }
+
+.istoric-alarme-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.istoric-alarme-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.istoric-alarme-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.alarme-table-container {
+  overflow-x: auto;
+}
+
+.alarme-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.alarme-table th,
+.alarme-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.alarme-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.alarme-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.alarme-table tr.alarma {
+  background-color: rgba(255, 76, 76, 0.05);
+}
+
+.alarme-table tr.avertizare {
+  background-color: rgba(255, 193, 7, 0.05);
+}
+
+.alarma-tip {
+  font-weight: 500;
+}
+
+td.rezolvat {
+  color: #28a745;
+  font-weight: 500;
+}
+
+td.activ {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.no-records-message {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.no-records-message i {
+  margin-right: 8px;
+  color: #6c757d;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+.error-message {
+  text-align: center;
+  padding: 20px;
+  color: #dc3545;
+}
+
+@media (max-width: 768px) {
+  .alarme-table th,
+  .alarme-table td {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+}

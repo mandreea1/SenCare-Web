@@ -1226,6 +1226,32 @@ app.get('/api/pacient/datefiziologice', async (req, res) => {
   }
 });
 
+app.get('/api/pacient/istoric-alarme', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    // Găsește PacientID după userId
+    const pacient = await new sql.Request()
+      .input('UserID', sql.Int, userId)
+      .query('SELECT PacientID FROM Pacienti WHERE UserID = @UserID');
+    if (!pacient.recordset.length) return res.json([]);
+    const pacientId = pacient.recordset[0].PacientID;
+
+    // Selectează istoricul alarmelor
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, pacientId)
+      .query(`
+        SELECT 
+          DataCreare, Actiune, TipAlarma, Descriere
+        FROM IstoricAlarmeAvertizari
+        WHERE PacientID = @PacientID
+        ORDER BY DataCreare DESC
+      `);
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
