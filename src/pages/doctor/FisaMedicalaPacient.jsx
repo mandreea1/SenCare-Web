@@ -11,7 +11,7 @@ function FisaMedicalaPacient() {
   const [istoric, setIstoric] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mesaj, setMesaj] = useState('');
-  const [ecgStringDinBackendSauUltimaMasurare, setEcgStringDinBackendSauUltimaMasurare] = useState('');
+ const [allEcgData, setAllEcgData] = useState([]); 
   const [valoriNormale, setValoriNormale] = useState(null);
   const [editValori, setEditValori] = useState(false);
   const [formValori, setFormValori] = useState({
@@ -79,22 +79,35 @@ const [newRecomandare, setNewRecomandare] = useState({
     fetchIstoric();
   }, [id]);
 
-useEffect(() => {
-  async function fetchEcg() {
-    try {
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/ecg-ultim`);
-      console.log('ECG response:', res.data);
-      // Transformă stringul în array de numere
-      const ecgArray = res.data?.ECG
-        ? res.data.ECG.split(',').map(val => Number(val.trim()))
-        : [];
-      setEcgStringDinBackendSauUltimaMasurare(ecgArray);
-    } catch (err) {
-      setEcgStringDinBackendSauUltimaMasurare([]);
-    }
-  }
-  fetchEcg();
-}, [id]);
+  useEffect(() => {
+    const fetchECG = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/ecg-ultim`
+        );
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setAllEcgData(response.data);
+        } else {
+          setAllEcgData([]);
+        }
+      } catch (error) {
+        setAllEcgData([]);
+        console.error("Eroare la obținerea datelor ECG:", error);
+      }
+    };
+    if (id) fetchECG();
+  }, [id]);
+  const allEcgValues = allEcgData
+    .filter(item => item.ECG && item.ECG.trim() !== '')
+    .flatMap(item => {
+      try {
+        const arr = JSON.parse(item.ECG);
+        return Array.isArray(arr) ? arr : [];
+      } catch {
+        return [];
+      }
+    });
+
 
 useEffect(() => {
   async function fetchValoriNormale() {
@@ -376,9 +389,13 @@ const handleDeletePdf = async (recordId) => {
         <div className="fisa-section">
           <b>II. Grafice evoluție</b>
           <div style={{ marginTop: 16 }}>
-            <GraficeEvolutie id={pacient.PacientID || pacient.id || id} />
-            <EcgChart ecgString={ecgStringDinBackendSauUltimaMasurare} />
-          </div>
+  <GraficeEvolutie id={id} />
+  {allEcgValues.length > 0 ? (
+    <EcgChart ecgString={allEcgValues} />
+  ) : (
+    <div style={{ color: '#888' }}>Nu există date ECG.</div>
+  )}
+</div>
         </div>
         <div className="fisa-section">
             <b>III. Valori normale senzori</b>

@@ -6,11 +6,12 @@ import axios from 'axios';
 
 function PacientFisaMedicala() {
   const { user } = useAuth();
+  const userId = user?.userId;
   const [pacient, setPacient] = useState(null);
   const [istoric, setIstoric] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mesaj, setMesaj] = useState('');
-  const [ecgStringDinBackendSauUltimaMasurare, setEcgStringDinBackendSauUltimaMasurare] = useState('');
+  const [allEcgData, setAllEcgData] = useState([]); 
   const [valoriNormale, setValoriNormale] = useState(null);
   const [alarmeAvertizari, setAlarmeAvertizari] = useState([]);
   const [recomandari, setRecomandari] = useState([]);
@@ -57,20 +58,34 @@ useEffect(() => {
 }, [user]);
 
 useEffect(() => {
-  async function fetchEcg() {
+  const fetchECG = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/pacient/ecg-ultim?userId=${user?.userId}`);
-      console.log('ECG response:', res.data); // <-- aici vezi ce primești de la backend
-      const ecgArray = res.data?.ECG
-        ? res.data.ECG.split(',').map(val => Number(val.trim()))
-        : [];
-      setEcgStringDinBackendSauUltimaMasurare(ecgArray);
-    } catch (err) {
-      setEcgStringDinBackendSauUltimaMasurare([]);
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/pacient/ecg-ultim?userId=${userId}`
+      );
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setAllEcgData(response.data);
+      } else {
+        setAllEcgData([]);
+      }
+    } catch (error) {
+      setAllEcgData([]);
+      console.error("Eroare la obținerea datelor ECG:", error);
     }
-  }
-  if (user?.userId) fetchEcg();
-}, [user]);
+  };
+  if (userId) fetchECG();
+}, [userId]);
+const allEcgValues = allEcgData
+  .filter(item => item.ECG && item.ECG.trim() !== '')
+  .flatMap(item => {
+    try {
+      const arr = JSON.parse(item.ECG);
+      return Array.isArray(arr) ? arr : [];
+    } catch {
+      return [];
+    }
+  });
+
 
 useEffect(() => {
   async function fetchValoriNormale() {
@@ -158,10 +173,14 @@ const downloadAndShowPdf = async (pdfId) => {
         </div>
         <div className="fisa-section">
           <b>II. Grafice evoluție</b>
-          <div style={{ marginTop: 16 }}>
-            <GraficeEvolutie1 userId={user?.userId} />
-            <EcgChart1 ecgString={ecgStringDinBackendSauUltimaMasurare} />
-          </div>
+<div style={{ marginTop: 16 }}>
+  <GraficeEvolutie1 userId={userId} />
+  {allEcgValues.length > 0 ? (
+    <EcgChart1 ecgString={allEcgValues} />
+  ) : (
+    <div style={{ color: '#888' }}>Nu există date ECG.</div>
+  )}
+</div>
         </div>
         <div className="fisa-section">
           <b>III. Valori normale senzori</b>
