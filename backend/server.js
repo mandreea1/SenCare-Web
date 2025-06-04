@@ -366,20 +366,20 @@ app.put('/api/doctor/pacient/:id', async (req, res) => {
       .query(`UPDATE DateMedicale SET IstoricMedical=@IstoricMedical, Alergii=@Alergii, ConsultatiiCardiologice=@ConsultatiiCardiologice WHERE PacientID=@PacientID`);
 
     // 5. INSERARE ÎN ISTORIC cu valorile vechi dacă s-au modificat
-    if (vechiDate && (
-    (IstoricMedical !== undefined && IstoricMedical !== vechiDate.IstoricMedical) ||
-    (Alergii !== undefined && Alergii !== vechiDate.Alergii) ||
-    (ConsultatiiCardiologice !== undefined && ConsultatiiCardiologice !== vechiDate.ConsultatiiCardiologice)
-)) {
-  const istoricText = 
-    `Istoric Medical: ${vechiDate.IstoricMedical || '-'} | ` +
-    `Alergii: ${vechiDate.Alergii || '-'} | ` +
-    `Consultații Cardiologice: ${vechiDate.ConsultatiiCardiologice || '-'}`;
-  await transaction.request()
-    .input('istoricpacient', sql.NVarChar(sql.MAX), istoricText)
-    .input('pacientid', sql.Int, id)
-    .query(`INSERT INTO istoric (istoricpacient, pacientid) VALUES (@istoricpacient, @pacientid)`);
-}
+//     if (vechiDate && (
+//     (IstoricMedical !== undefined && IstoricMedical !== vechiDate.IstoricMedical) ||
+//     (Alergii !== undefined && Alergii !== vechiDate.Alergii) ||
+//     (ConsultatiiCardiologice !== undefined && ConsultatiiCardiologice !== vechiDate.ConsultatiiCardiologice)
+// )) {
+//   const istoricText = 
+//     `Istoric Medical: ${vechiDate.IstoricMedical || '-'} | ` +
+//     `Alergii: ${vechiDate.Alergii || '-'} | ` +
+//     `Consultații Cardiologice: ${vechiDate.ConsultatiiCardiologice || '-'}`;
+//   await transaction.request()
+//     .input('istoricpacient', sql.NVarChar(sql.MAX), istoricText)
+//     .input('pacientid', sql.Int, id)
+//     .query(`INSERT INTO istoric (istoricpacient, pacientid) VALUES (@istoricpacient, @pacientid)`);
+// }
 
     await transaction.commit();
     res.json({ message: 'Pacient modificat cu succes!' });
