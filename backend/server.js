@@ -1401,6 +1401,7 @@ app.post('/api/mobile/istoric-alarme', async (req, res) => {
 
 app.get('/api/doctor/pacient/:id/istoric-alarme-activate', async (req, res) => {
   const { id } = req.params;
+  console.log('PacientID primit:', id);
   try {
     const result = await new sql.Request()
       .input('PacientID', sql.Int, id)
