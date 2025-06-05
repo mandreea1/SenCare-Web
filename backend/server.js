@@ -1399,6 +1399,23 @@ app.post('/api/mobile/istoric-alarme', async (req, res) => {
   }
 });
 
+app.get('/api/doctor/pacient/:id/istoric-alarme-activate', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await new sql.Request()
+      .input('PacientID', sql.Int, id)
+      .query(`
+        SELECT DataCreare, Actiune, TipAlarma, Descriere
+        FROM IstoricAlarmeAvertizari
+        WHERE PacientID = @PacientID AND Actiune = 'ACTIVATĂ'
+        ORDER BY DataCreare DESC
+      `);
+    res.json(result.recordset);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('SenCare backend API running.');
 });
