@@ -1408,7 +1408,7 @@ app.get('/api/doctor/pacient/:id/istoric-alarme-activate', async (req, res) => {
       .query(`
         SELECT DataCreare, Actiune, TipAlarma, Descriere
         FROM IstoricAlarmeAvertizari
-        WHERE PacientID = @PacientID AND Actiune = 'ACTIVATĂ'
+        WHERE PacientID = @PacientID AND Actiune = 'ACTIVATA'
         ORDER BY DataCreare DESC
       `);
     res.json(result.recordset);
