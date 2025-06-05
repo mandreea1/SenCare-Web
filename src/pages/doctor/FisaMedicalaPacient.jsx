@@ -24,6 +24,8 @@ function FisaMedicalaPacient() {
   ValoareUmiditateMin: '',
   ValoareUmiditateMax: ''
 });
+const [istoricAlarmeActivate, setIstoricAlarmeActivate] = useState([]);
+
 
 const [showAlarmModal, setShowAlarmModal] = useState(false);
 const [selectedParameter, setSelectedParameter] = useState(null);
@@ -166,6 +168,21 @@ useEffect(() => {
   }
   fetchMedicalRecordHistory();
 }, [id]);
+useEffect(() => {
+  console.log('id pentru fetch istoric alarme activate:', id); // Adaugă acest log
+  async function fetchIstoricAlarmeActivate() {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/doctor/pacient/${id}/istoric-alarme-activate`
+      );
+      setIstoricAlarmeActivate(res.data);
+    } catch (err) {
+      console.error('Eroare la încărcarea istoricului alarmelor activate:', err);
+    }
+  }
+  fetchIstoricAlarmeActivate();
+}, [id]);
+
 const handleAddRecomandare = async () => {
   try {
     await axios.post(
@@ -696,6 +713,21 @@ const handleDeletePdf = async (recordId) => {
       <i className="fas fa-info-circle"></i> Nu există fișe medicale salvate în istoric.
     </p>
   )}
+</div>
+
+<div className="fisa-section">
+  <h3 className="istoric-fise-title">Istoric alarme/avertizări activate</h3>
+  {istoricAlarmeActivate.length === 0 && (
+    <div className="fisa-field"><i>Nu există alarme/avertizări activate.</i></div>
+  )}
+  {istoricAlarmeActivate.map((item, idx) => (
+    <div className="fisa-field" key={idx}>
+      <b>{item.TipAlarma}</b> — {item.Descriere}
+      <div style={{ fontSize: 12, color: '#888' }}>
+        {new Date(item.DataCreare).toLocaleString('ro-RO')}
+      </div>
+    </div>
+  ))}
 </div>
   
   <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => navigate(-1)}>
