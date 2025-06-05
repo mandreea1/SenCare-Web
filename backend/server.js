@@ -978,42 +978,42 @@ app.delete('/api/doctor/pacient/:id/medical-records-pdf/:recordId', async (req, 
   }
 });
 
-app.get('/api/pacient/profil', async (req, res) => {
-  const { userId, email } = req.query;
-  if (!userId && !email) {
-    return res.status(400).json({ error: 'Trebuie să trimiți userId sau email.' });
-  }
+// app.get('/api/pacient/profil', async (req, res) => {
+//   const { userId, email } = req.query;
+//   if (!userId && !email) {
+//     return res.status(400).json({ error: 'Trebuie să trimiți userId sau email.' });
+//   }
 
-  try {
-    let result;
-    if (userId) {
-      result = await sql.query`
-        SELECT 
-          p.PacientID, p.UserID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca,
-          u.Email, u.UserType
-        FROM Pacienti p
-        INNER JOIN Utilizatori u ON p.UserID = u.UserID
-        WHERE p.UserID = ${userId} AND u.UserType = 'Pacient'
-      `;
-    } else {
-      result = await sql.query`
-        SELECT 
-          p.PacientID, p.UserID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca,
-          u.Email, u.UserType
-        FROM Pacienti p
-        INNER JOIN Utilizatori u ON p.UserID = u.UserID
-        WHERE u.Email = ${email} AND u.UserType = 'Pacient'
-      `;
-    }
+//   try {
+//     let result;
+//     if (userId) {
+//       result = await sql.query`
+//         SELECT 
+//           p.PacientID, p.UserID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca,
+//           u.Email, u.UserType
+//         FROM Pacienti p
+//         INNER JOIN Utilizatori u ON p.UserID = u.UserID
+//         WHERE p.UserID = ${userId} AND u.UserType = 'Pacient'
+//       `;
+//     } else {
+//       result = await sql.query`
+//         SELECT 
+//           p.PacientID, p.UserID, p.Nume, p.Prenume, p.Varsta, p.CNP, p.Adresa, p.NumarTelefon, p.Profesie, p.LocMunca,
+//           u.Email, u.UserType
+//         FROM Pacienti p
+//         INNER JOIN Utilizatori u ON p.UserID = u.UserID
+//         WHERE u.Email = ${email} AND u.UserType = 'Pacient'
+//       `;
+//     }
 
-    if (!result.recordset.length) {
-      return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
-    }
-    res.json(result.recordset[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+//     if (!result.recordset.length) {
+//       return res.status(404).json({ error: 'Pacientul nu a fost găsit.' });
+//     }
+//     res.json(result.recordset[0]);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 // GET profil pacient
 app.get('/api/pacient/profil', async (req, res) => {
